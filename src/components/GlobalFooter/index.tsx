@@ -16,7 +16,7 @@ const GlobalFooter: React.FC = () => {
               <GithubOutlined /> 支持项目
             </Tooltip>
           ),
-          href: 'https://github.com/liyupi/code-nav',
+          href: 'https://github.com/xzy0625/staudy-nav',
           blankTarget: true,
         },
         {
