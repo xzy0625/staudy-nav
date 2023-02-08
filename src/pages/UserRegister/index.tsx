@@ -1,12 +1,22 @@
 import type { FC } from 'react';
 import { useState, useEffect } from 'react';
-import { Form, Button, Col, Input, Popover, Progress, Row, Select, message } from 'antd';
+import {
+  Form,
+  Button,
+  Col,
+  Input,
+  Popover,
+  Progress,
+  Row,
+  Select,
+  message,
+} from 'antd';
 import type { Store } from 'antd/es/form/interface';
-import { Link, useRequest, history } from 'umi';
-import type { StateType } from './service';
-import { fakeRegister } from './service';
-
+import { Link, history } from 'umi';
+import { sleep, validatePhnoeNubmer } from '../../utils/index';
+import sendCode from '../../api/account/code';
 import styles from './style.less';
+import register from '@/api/account/register';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -40,15 +50,10 @@ const passwordProgressMap: {
   poor: 'exception',
 };
 
-const UserRegister: FC = () => {
-  const [count, setCount]: [number, any] = useState(0);
-  const [visible, setVisible]: [boolean, any] = useState(false);
-  const [prefix, setPrefix]: [string, any] = useState('86');
-  const [popover, setPopover]: [boolean, any] = useState(false);
-  const confirmDirty = false;
+// 倒计时hooks
+const useTimer = (number: number) => {
   let interval: number | undefined;
-  const [form] = Form.useForm();
-
+  const [count, setCount]: [number, any] = useState(0);
   useEffect(
     () => () => {
       clearInterval(interval);
@@ -56,8 +61,12 @@ const UserRegister: FC = () => {
     [interval],
   );
 
-  const onGetCaptcha = () => {
-    let counts = 59;
+  const start = () => {
+    // 在倒计时的时候就不让用了
+    if (count) {
+      return;
+    }
+    let counts = number - 1;
     setCount(counts);
     interval = window.setInterval(() => {
       counts -= 1;
@@ -66,6 +75,36 @@ const UserRegister: FC = () => {
         clearInterval(interval);
       }
     }, 1000);
+  };
+
+  return [count, start] as [number, any];
+};
+
+const UserRegister: FC = () => {
+  const [count, startTimer]: [number, any] = useTimer(60);
+  const [visible, setVisible]: [boolean, any] = useState(false);
+  const [prefix, setPrefix]: [string, any] = useState('86');
+  const [popover, setPopover]: [boolean, any] = useState(false);
+  const [loading, setLoading]: [boolean, any] = useState(false);
+  const confirmDirty = false;
+  const [form] = Form.useForm();
+
+  // 获取验证码
+  const onGetcode = async () => {
+    const phone = form.getFieldValue('phone');
+    if (!validatePhnoeNubmer(phone)) {
+      message.error('请先输入正确的手机号码');
+      return;
+    }
+    const data = await sendCode({ phone });
+
+    if (data?.code !== 0) {
+      message.error(data?.msg || '验证码发送失败');
+      return;
+    } else {
+      message.info('验证码发送成功');
+    }
+    startTimer();
   };
 
   const getPasswordStatus = () => {
@@ -79,22 +118,26 @@ const UserRegister: FC = () => {
     return 'poor';
   };
 
-  const { loading: submitting, run: register } = useRequest<{ data: StateType }>(fakeRegister, {
-    manual: true,
-    onSuccess: (data, params) => {
-      if (data.status === 'ok') {
-        message.success('注册成功！');
-        history.push({
-          pathname: '/user/register-result',
-          state: {
-            account: params.email,
-          },
-        });
+  const onFinish = async (values: Store) => {
+    console.log(values, '......');
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await register(values);
+      if (res.code === 0) {
+        message.info('注册成功，即将跳转登录');
+        await sleep(2000);
+        history.push({ pathname: '/login' });
+      } else {
+        throw new Error(res.msg);
       }
-    },
-  });
-  const onFinish = (values: Store) => {
-    register(values);
+    } catch (error) {
+      message.error(`注册失败，失败原因 ${error}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const checkConfirm = (_: any, value: string) => {
@@ -147,139 +190,149 @@ const UserRegister: FC = () => {
   };
 
   return (
-    <div className={styles.main}>
-      <h3>注册</h3>
-      <Form form={form} name="UserRegister" onFinish={onFinish}>
-        <FormItem
-          name="mail"
-          rules={[
-            {
-              required: true,
-              message: '请输入邮箱地址!',
-            },
-            {
-              type: 'email',
-              message: '邮箱地址格式错误!',
-            },
-          ]}
-        >
-          <Input size="large" placeholder="邮箱" />
-        </FormItem>
-        <Popover
-          getPopupContainer={(node) => {
-            if (node && node.parentNode) {
-              return node.parentNode as HTMLElement;
-            }
-            return node;
-          }}
-          content={
-            visible && (
-              <div style={{ padding: '4px 0' }}>
-                {passwordStatusMap[getPasswordStatus()]}
-                {renderPasswordProgress()}
-                <div style={{ marginTop: 10 }}>
-                  <span>请至少输入 6 个字符。请不要使用容易被猜到的密码。</span>
-                </div>
-              </div>
-            )
-          }
-          overlayStyle={{ width: 240 }}
-          placement="right"
-          visible={visible}
-        >
+    <>
+      <div className={styles.container}></div>
+      <div className={styles.main}>
+        <h3>注册</h3>
+        <Form form={form} name="UserRegister" onFinish={onFinish}>
           <FormItem
-            name="password"
-            className={
-              form.getFieldValue('password') &&
-              form.getFieldValue('password').length > 0 &&
-              styles.password
-            }
-            rules={[
-              {
-                validator: checkPassword,
-              },
-            ]}
-          >
-            <Input size="large" type="password" placeholder="至少6位密码，区分大小写" />
-          </FormItem>
-        </Popover>
-        <FormItem
-          name="confirm"
-          rules={[
-            {
-              required: true,
-              message: '确认密码',
-            },
-            {
-              validator: checkConfirm,
-            },
-          ]}
-        >
-          <Input size="large" type="password" placeholder="确认密码" />
-        </FormItem>
-        <InputGroup compact>
-          <Select size="large" value={prefix} onChange={changePrefix} style={{ width: '20%' }}>
-            <Option value="86">+86</Option>
-            <Option value="87">+87</Option>
-          </Select>
-          <FormItem
-            style={{ width: '80%' }}
-            name="mobile"
+            name="username"
             rules={[
               {
                 required: true,
-                message: '请输入手机号!',
-              },
-              {
-                pattern: /^\d{11}$/,
-                message: '手机号格式错误!',
+                message: '请输入用户名!',
               },
             ]}
           >
-            <Input size="large" placeholder="手机号" />
+            <Input size="large" placeholder="用户名" />
           </FormItem>
-        </InputGroup>
-        <Row gutter={8}>
-          <Col span={16}>
+          <Popover
+            getPopupContainer={(node) => {
+              if (node && node.parentNode) {
+                return node.parentNode as HTMLElement;
+              }
+              return node;
+            }}
+            content={
+              visible && (
+                <div style={{ padding: '4px 0' }}>
+                  {passwordStatusMap[getPasswordStatus()]}
+                  {renderPasswordProgress()}
+                  <div style={{ marginTop: 10 }}>
+                    <span>
+                      请至少输入 6 个字符。请不要使用容易被猜到的密码。
+                    </span>
+                  </div>
+                </div>
+              )
+            }
+            overlayStyle={{ width: 240 }}
+            placement="right"
+            visible={visible}
+          >
             <FormItem
-              name="captcha"
+              name="password"
+              className={
+                form.getFieldValue('password') &&
+                form.getFieldValue('password').length > 0 &&
+                styles.password
+              }
               rules={[
                 {
-                  required: true,
-                  message: '请输入验证码!',
+                  validator: checkPassword,
                 },
               ]}
             >
-              <Input size="large" placeholder="验证码" />
+              <Input
+                size="large"
+                type="password"
+                placeholder="至少6位密码，区分大小写"
+              />
             </FormItem>
-          </Col>
-          <Col span={8}>
+          </Popover>
+          <FormItem
+            name="confirm"
+            rules={[
+              {
+                required: true,
+                message: '确认密码',
+              },
+              {
+                validator: checkConfirm,
+              },
+            ]}
+          >
+            <Input size="large" type="password" placeholder="确认密码" />
+          </FormItem>
+          <InputGroup compact>
+            <Select
+              size="large"
+              value={prefix}
+              onChange={changePrefix}
+              style={{ width: '20%' }}
+            >
+              <Option value="86">+86</Option>
+              <Option value="87">+87</Option>
+            </Select>
+            <FormItem
+              style={{ width: '80%' }}
+              name="phone"
+              rules={[
+                {
+                  required: true,
+                  message: '请输入手机号!',
+                },
+                {
+                  pattern: /^\d{11}$/,
+                  message: '手机号格式错误!',
+                },
+              ]}
+            >
+              <Input size="large" placeholder="手机号" />
+            </FormItem>
+          </InputGroup>
+          <Row gutter={8}>
+            <Col span={16}>
+              <FormItem
+                name="code"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入验证码!',
+                  },
+                ]}
+              >
+                <Input size="large" placeholder="验证码" />
+              </FormItem>
+            </Col>
+            <Col span={8}>
+              <Button
+                size="large"
+                disabled={!!count}
+                className={styles.getcode}
+                onClick={onGetcode}
+              >
+                {count ? `${count} s` : '获取验证码'}
+              </Button>
+            </Col>
+          </Row>
+          <FormItem>
             <Button
               size="large"
-              disabled={!!count}
-              className={styles.getCaptcha}
-              onClick={onGetCaptcha}
+              loading={loading}
+              className={styles.submit}
+              type="primary"
+              htmlType="submit"
             >
-              {count ? `${count} s` : '获取验证码'}
+              <span>注册</span>
             </Button>
-          </Col>
-        </Row>
-        <FormItem>
-          <Button
-            size="large"
-            loading={submitting}
-            className={styles.submit}
-            type="primary"
-            htmlType="submit"
-          >
-            <span>注册</span>
-          </Button>
-          <Link className={styles.login} to="/user/login">
-            <span>使用已有账户登录</span>
-          </Link>
-        </FormItem>
-      </Form>
-    </div>
+            <Link className={styles.login} to="/login">
+              <span>使用已有账户登录</span>
+            </Link>
+          </FormItem>
+        </Form>
+      </div>
+    </>
   );
 };
 export default UserRegister;

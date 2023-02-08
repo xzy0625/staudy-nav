@@ -1,6 +1,10 @@
 import { DefaultFooter } from '@ant-design/pro-layout';
 import { Tooltip } from 'antd';
-import { GithubOutlined, InfoCircleOutlined, WechatOutlined } from '@ant-design/icons';
+import {
+  GithubOutlined,
+  InfoCircleOutlined,
+  WechatOutlined,
+} from '@ant-design/icons';
 import wechat from '@/assets/wechat.jpeg';
 import React from 'react';
 
@@ -22,11 +26,13 @@ const GlobalFooter: React.FC = () => {
         {
           key: 'contact',
           title: (
-            <Tooltip title={<img src={wechat} alt="微信 code_nav" width="200" />}>
+            <Tooltip
+              title={<img src={wechat} alt="微信 code_nav" width="200" />}
+            >
               <WechatOutlined /> 联系作者
             </Tooltip>
           ),
-          href: 'https://doc.code-nav.cn/author',
+          href: 'http://csu_xzy.gitee.io/stadu-nav-doc/#/?id=%e5%85%b3%e4%ba%8e%e4%bd%9c%e8%80%85',
           blankTarget: true,
         },
         {
@@ -36,7 +42,7 @@ const GlobalFooter: React.FC = () => {
               <InfoCircleOutlined /> 免责声明
             </>
           ),
-          href: 'https://doc.code-nav.cn/#%E5%85%8D%E8%B4%A3%E5%A3%B0%E6%98%8E',
+          href: 'http://csu_xzy.gitee.io/stadu-nav-doc/#/?id=%e5%85%8d%e8%b4%a3%e5%a3%b0%e6%98%8e',
           blankTarget: true,
         },
       ]}

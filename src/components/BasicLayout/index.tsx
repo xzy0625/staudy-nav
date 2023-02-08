@@ -4,7 +4,7 @@ import type {
 } from '@ant-design/pro-layout';
 import ProLayout from '@ant-design/pro-layout';
 import React, { useEffect } from 'react';
-import type { Dispatch} from 'umi';
+import type { Dispatch } from 'umi';
 import { connect, history, Link } from 'umi';
 import {
   AppstoreOutlined,
@@ -27,7 +27,7 @@ import { stringify } from 'querystring';
 // import { closeNoticeWatcher, openNoticeWatcher } from '@/services/notice';
 import defaultSettings from '../../config/defaultSettings';
 import menu from '../../config/menu';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo.svg';
 import './BasicLayout.less';
 
 const noMatch = (
@@ -88,8 +88,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     currentAuthority,
   } = props;
 
-
-  console.log(route, children, 'routers,')
+  console.log(route, children, 'routers,');
 
   // useEffect(() => {
   //   if (dispatch) {

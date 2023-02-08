@@ -8,6 +8,16 @@ export default defineConfig({
   },
   routes: [
     {
+      name: '注册页',
+      path: '/register',
+      component: './UserRegister',
+    },
+    {
+      name: '登录页',
+      path: '/login',
+      component: './UserLogin',
+    },
+    {
       path: '/',
       component: '@/components/LoadingLayout/LoadingLayout',
       routes: [
@@ -19,11 +29,6 @@ export default defineConfig({
               name: '资源列表',
               path: '/toolList',
               component: './ToolList',
-            },
-            {
-              name: '注册页',
-              path: '/userregister',
-              component: './UserRegister',
             },
             {
               path: '/aa',

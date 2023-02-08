@@ -1,4 +1,4 @@
-import cloudbase from "@cloudbase/js-sdk";
+import cloudbase from '@cloudbase/js-sdk';
 
 // 测试环境 id
 const TEST_ENV_ID = 'test';
@@ -19,19 +19,20 @@ class TCB {
   initApp() {
     this.app = cloudbase.init({
       env: this.envId,
-      region: "ap-shanghai"
+      region: 'ap-shanghai',
     });
+    console.log(this.app, '2222222');
   }
 
   // 登出
   tcbLogout() {
     return this.auth.signOut();
   }
-  
+
   // 鉴权
   initAuth() {
-    this.app.auth({
-      persistence: "local",
+    this.auth = this.app.auth({
+      persistence: 'local',
     });
   }
 
@@ -43,17 +44,18 @@ class TCB {
     // 判断是不是已经登录了
     let loginState = await this.auth.getLoginState();
     if (!loginState) {
+      // await this.auth.signInAnonymously();
+      // const loginScope = await this.auth.loginScope();
+      // 如为匿名登录，则输出 true
       // 2. 匿名登录
       await this.auth.anonymousAuthProvider().signIn();
       loginState = await this.auth.getLoginState();
-      if (loginState) {
-        console.log('tcbLogin sucessed', loginState);
-      }
+      console.log('tcbLogin登录成功', loginState);
     }
   }
 
   // 函数调用
-  callFunction ({
+  callFunction({
     name = '',
     data = {},
     query = {},
@@ -79,5 +81,7 @@ export const getTCBInstance = () => {
   }
 
   tcbIns = new TCB();
+  tcbIns.initApp();
+  tcbIns.initAuth();
   return tcbIns;
-}
+};

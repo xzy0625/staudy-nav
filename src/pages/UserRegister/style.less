@@ -1,12 +1,26 @@
 @import '~antd/es/style/themes/default.less';
-
+.container {
+  width: 100wh;
+  height: 100vh;
+  background-image: url('../../assets/wall1.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 .main {
-  width: 368px;
-  margin: 0 auto;
+  position: fixed;
+  top: 10%;
+  width: 430px;
+  height: 500px;
+  margin-left: 50%;
+  padding: 30px;
+  background-color: rgba(255, 255, 255, 0.4);
+  transform: translate(-184px);
 
   h3 {
+    display: flex;
+    justify-content: center;
     margin-bottom: 20px;
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .password {
