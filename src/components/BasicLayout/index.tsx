@@ -88,8 +88,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     currentAuthority,
   } = props;
 
-  console.log(route, children, 'routers,');
-
   // useEffect(() => {
   //   if (dispatch) {
   //     dispatch({
@@ -141,8 +139,10 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       layout="top"
       navTheme="realDark"
       style={{
-        height: '100vh',
+        height: '100%',
       }}
+      fixedHeader
+      contentStyle={{ height: '100%' }}
       onMenuHeaderClick={() => history.push('/')}
       menuItemRender={(menuItemProps, defaultDom) => {
         if (menuItemProps.isUrl || !menuItemProps.path) {

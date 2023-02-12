@@ -18,6 +18,10 @@ export default defineConfig({
       component: './UserLogin',
     },
     {
+      path: '/404',
+      component: './404',
+    },
+    {
       path: '/',
       component: '@/components/LoadingLayout/LoadingLayout',
       routes: [
@@ -29,10 +33,6 @@ export default defineConfig({
               name: '资源列表',
               path: '/toolList',
               component: './ToolList',
-            },
-            {
-              path: '/aa',
-              component: '@/components/BasicLayout/test',
             },
             {
               path: '/index',
@@ -50,7 +50,13 @@ export default defineConfig({
               component: './AccountSettings',
             },
             {
-              path: '/404',
+              name: '推荐资源',
+              path: '/addResource',
+              component: './AddResource',
+            },
+            {
+              path: '/*',
+              redirect: '/404',
               component: './404',
             },
           ],

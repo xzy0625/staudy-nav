@@ -7,7 +7,7 @@
 // import {connect} from "umi";
 // import type {ConnectState} from "@/models/connect";
 
-import { useState } from "react";
+import { useState } from 'react';
 
 // interface LoadingLayoutProps extends Partial<ConnectProps> {
 //   dispatch: Dispatch;
@@ -73,10 +73,12 @@ import { useState } from "react";
 // }))(LoadingLayout);
 
 const LoadingLayout = (props) => {
-  const {children, dispatch, userId, location = {query: {}}} = props;
-  const [ss, set] = useState(false)
-  setTimeout(() => {set(true)}, 2000)
-  return ss ? <>{children}</> : <>11111</>
-}
+  const { children, dispatch, userId, location = { query: {} } } = props;
+  const [ss, set] = useState(false);
+  setTimeout(() => {
+    set(true);
+  }, 500);
+  return ss ? <>{children}</> : <>11111</>;
+};
 
 export default LoadingLayout;

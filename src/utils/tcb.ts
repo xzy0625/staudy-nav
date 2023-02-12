@@ -21,7 +21,6 @@ class TCB {
       env: this.envId,
       region: 'ap-shanghai',
     });
-    console.log(this.app, '2222222');
   }
 
   // 登出

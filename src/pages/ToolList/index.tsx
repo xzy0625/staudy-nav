@@ -4,16 +4,31 @@ import {
   EllipsisOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
-import { Avatar, Card, Col, Dropdown, Form, List, Menu, Row, Select, Tooltip } from 'antd';
+import {
+  Avatar,
+  Card,
+  Col,
+  Dropdown,
+  Form,
+  List,
+  Menu,
+  message,
+  Pagination,
+  Row,
+  Select,
+  Tooltip,
+} from 'antd';
 import numeral from 'numeral';
-import type { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import React from 'react';
 import { useRequest } from 'umi';
 import StandardFormRow from './components/StandardFormRow';
 import TagSelect from './components/TagSelect';
-import type { ListItemDataType } from './data.d';
+import type { IPagination, ListItemDataType } from './type';
 import { queryFakeList } from './service';
 import styles from './style.less';
+import getTags from '@/api/tags';
+import { defaultPagination } from '@/const';
 
 const { Option } = Select;
 
@@ -67,34 +82,66 @@ const CardInfo: React.FC<{
 );
 
 export const ToolList: FC<Record<string, any>> = () => {
+  // 标签数据
+  const [tags, setTags]: [IAnyObject, any] = useState({});
+  // 分页数据
+  const [pagination, setPagination]: [IPagination, any] =
+    useState(defaultPagination);
+
   const { data, loading, run } = useRequest((values: any) => {
     console.log('form data', values);
     return queryFakeList({
-      count: 8,
+      count: 12,
     });
   });
 
   const list = data?.list || [];
 
-  const itemMenu = (
-    <Menu>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="https://www.alipay.com/">
-          1st menu item
-        </a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="https://www.taobao.com/">
-          2nd menu item
-        </a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="https://www.tmall.com/">
-          3d menu item
-        </a>
-      </Menu.Item>
-    </Menu>
-  );
+  // const itemMenu = (
+  //   <Menu>
+  //     <Menu.Item>
+  //       <a target="_blank" rel="noopener noreferrer" href="https://www.alipay.com/">
+  //         1st menu item
+  //       </a>
+  //     </Menu.Item>
+  //     <Menu.Item>
+  //       <a target="_blank" rel="noopener noreferrer" href="https://www.taobao.com/">
+  //         2nd menu item
+  //       </a>
+  //     </Menu.Item>
+  //     <Menu.Item>
+  //       <a target="_blank" rel="noopener noreferrer" href="https://www.tmall.com/">
+  //         3d menu item
+  //       </a>
+  //     </Menu.Item>
+  //   </Menu>
+  // );
+
+  // 初始化标签数据
+  const initTags = async () => {
+    try {
+      const tagsdata = await getTags();
+      setTags(tagsdata as IAnyObject);
+    } catch (error) {
+      message.error(error);
+    }
+  };
+
+  // 获取列表数据
+  const getListData = () => {
+    const { page, pagesize } = pagination;
+  };
+
+  const onPaginationChange = (
+    page: IPagination['page'],
+    pagesize: IPagination['pageSize'],
+  ) => {
+    console.log(page, pagesize, '......changee');
+  };
+  // 初始化数据
+  useEffect(() => {
+    initTags();
+  }, []);
 
   return (
     <div className={styles.filterCardList}>
@@ -107,18 +154,14 @@ export const ToolList: FC<Record<string, any>> = () => {
           <StandardFormRow title="所属类目" block style={{ paddingBottom: 11 }}>
             <Form.Item name="category">
               <TagSelect expandable>
-                <TagSelect.Option value="cat1">类目一</TagSelect.Option>
-                <TagSelect.Option value="cat2">类目二</TagSelect.Option>
-                <TagSelect.Option value="cat3">类目三</TagSelect.Option>
-                <TagSelect.Option value="cat4">类目四</TagSelect.Option>
-                <TagSelect.Option value="cat5">类目五</TagSelect.Option>
-                <TagSelect.Option value="cat6">类目六</TagSelect.Option>
-                <TagSelect.Option value="cat7">类目七</TagSelect.Option>
-                <TagSelect.Option value="cat8">类目八</TagSelect.Option>
-                <TagSelect.Option value="cat9">类目九</TagSelect.Option>
-                <TagSelect.Option value="cat10">类目十</TagSelect.Option>
-                <TagSelect.Option value="cat11">类目十一</TagSelect.Option>
-                <TagSelect.Option value="cat12">类目十二</TagSelect.Option>
+                {tags?.entries &&
+                  tags
+                    ?.entries()
+                    ?.map((item: any, index: any) => (
+                      <TagSelect.Option value={item.value}>
+                        {item.label || '--'}
+                      </TagSelect.Option>
+                    ))}
               </TagSelect>
             </Form.Item>
           </StandardFormRow>
@@ -153,12 +196,15 @@ export const ToolList: FC<Record<string, any>> = () => {
                 <Tooltip title="分享" key="share">
                   <ShareAltOutlined />
                 </Tooltip>,
-                <Dropdown key="ellipsis" overlay={itemMenu}>
-                  <EllipsisOutlined />
-                </Dropdown>,
+                // <Dropdown key="ellipsis" overlay={itemMenu}>
+                //   <EllipsisOutlined />
+                // </Dropdown>,
               ]}
             >
-              <Card.Meta avatar={<Avatar size="small" src={item.avatar} />} title={item.title} />
+              <Card.Meta
+                avatar={<Avatar size="small" src={item.avatar} />}
+                title={item.title}
+              />
               <div className={styles.cardItemContent}>
                 <CardInfo
                   activeUser={formatWan(item.activeUser)}
@@ -169,6 +215,16 @@ export const ToolList: FC<Record<string, any>> = () => {
           </List.Item>
         )}
       />
+      <div className={styles.pagination}>
+        <Pagination
+          total={85}
+          showTotal={(total = 100) => `共 ${total} 条资源`}
+          defaultPageSize={pagination.pageSize}
+          defaultCurrent={pagination.page}
+          onChange={onPaginationChange}
+          pageSizeOptions={[12, 16, 24, 36, 44]}
+        />
+      </div>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { IPagination } from './../pages/ToolList/type.d';
 /**
  * 登录 Cookie 键名
  */
@@ -44,3 +45,10 @@ export const baseUrl = 'http://106.55.178.104:8889/api/';
 
 // 本地的根路径
 export const baseUrlDev = 'http://127.0.0.1:8889/api/';
+
+// 默认的分页数据
+export const defaultPagination: IPagination = {
+  page: 1,
+  pageSize: 12,
+  total: 0,
+};
