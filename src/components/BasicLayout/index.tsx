@@ -88,26 +88,26 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     currentAuthority,
   } = props;
 
-  // useEffect(() => {
-  //   if (dispatch) {
-  //     dispatch({
-  //       type: 'tag/get',
-  //     });
-  //   }
-  //   // 公告监听
-  //   openNoticeWatcher((notice) => {
-  //     const { title, content } = notice;
-  //     notification.info({
-  //       message: title,
-  //       description: content,
-  //       top: 64,
-  //       duration: 10,
-  //     });
-  //   });
-  //   return () => {
-  //     closeNoticeWatcher();
-  //   };
-  // }, []);
+  useEffect(() => {
+    if (dispatch) {
+      dispatch({
+        type: 'tag/get',
+      });
+    }
+    // // 公告监听
+    // openNoticeWatcher((notice) => {
+    //   const { title, content } = notice;
+    //   notification.info({
+    //     message: title,
+    //     description: content,
+    //     top: 64,
+    //     duration: 10,
+    //   });
+    // });
+    // return () => {
+    //   closeNoticeWatcher();
+    // };
+  }, []);
 
   useEffect(() => {
     if (dispatch && userId && !currentUser._id) {

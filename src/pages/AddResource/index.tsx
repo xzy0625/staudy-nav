@@ -203,28 +203,17 @@ const AddResource: FC<AddResourceProps> = (props) => {
     setShowSameNameModal(false);
   };
 
-  return !currentUser._id ? (
+  return currentUser._id ? (
     <PageContainer
       title="我要推荐"
-      content={
-        <span>
-          欢迎推荐优质编程资源，将获得
-          <a
-            href="https://doc.code-nav.cn/prize"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {' '}
-            积分奖励{' '}
-          </a>
-          💰
-        </span>
-      }
+      content={<span>欢迎推荐优质编程资源，共建繁荣学习社区</span>}
     >
       <Card bordered={false}>
         <Form
           style={{
             marginTop: 8,
+            width: 1200,
+            margin: '0 auto',
           }}
           form={form}
           name="resource"
@@ -233,6 +222,7 @@ const AddResource: FC<AddResourceProps> = (props) => {
           scrollToFirstError
           onFinish={onFinish}
           onValuesChange={onValuesChange}
+          wrapperCol={{}}
         >
           <FormItem
             label="名称"
@@ -305,11 +295,11 @@ const AddResource: FC<AddResourceProps> = (props) => {
               },
             ]}
           >
-            {/* <SelectTags
+            <SelectTags
               allTags={wholeTagsMap.allTags}
               groupTags={wholeTagsMap.groupTags}
               maxTagsNumber={5}
-            /> */}
+            />
           </FormItem>
           <FormItem
             label="图标"

@@ -1,13 +1,10 @@
 import type { Effect, Reducer } from 'umi';
-import { getTags } from '@/services/tag';
 import { message } from 'antd';
+import getTags from '@/api/tags';
+import { PartialConfigItem } from '@/cube/config_wrap';
 
-export type TagType = string;
-
-export interface GroupTag {
-  name: string;
-  tags: TagType[];
-}
+type GroupTag = PartialConfigItem;
+export type TagType = GroupTag;
 
 declare type categoryTagsMapType = Record<
   string,
@@ -17,7 +14,7 @@ declare type categoryTagsMapType = Record<
 export interface WholeTagsMap {
   hotTags: TagType[];
   allTags: TagType[];
-  groupTags: GroupTag[];
+  groupTags: TagType[];
   userIntroduceGroupTags: GroupTag[];
   categoryTagsMap: categoryTagsMapType;
 }
@@ -51,12 +48,15 @@ const Model: TagModelType = {
   },
 
   effects: {
+    // 获取所有的标签
     *get({ payload }, { call, put }) {
       const response = yield call(getTags, payload);
       if (response) {
         yield put({
           type: 'setWholeTagsMap',
-          payload: response,
+          payload: {
+            allTags: response.entries(),
+          },
         });
       } else {
         message.error('获取标签失败，请刷新页面');

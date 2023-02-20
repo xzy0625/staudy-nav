@@ -50,25 +50,25 @@ const SelectTags: React.FC<SelectTagsProps> = (props) => {
   /**
    * 分组标签视图
    */
-  const groupTagsView =
-    groupTags &&
-    groupTags.map((groupTag) => {
-      return (
-        <Tabs.TabPane tab={groupTag.name} key={groupTag.name}>
-          {groupTag.tags.map((tag) => {
-            return (
-              <Tag.CheckableTag
-                key={tag}
-                checked={value.indexOf(tag) > -1}
-                onChange={(checked) => handleChange(tag, checked)}
-              >
-                {tag}
-              </Tag.CheckableTag>
-            );
-          })}
-        </Tabs.TabPane>
-      );
-    });
+  // const groupTagsView =
+  //   groupTags &&
+  //   groupTags.map((groupTag) => {
+  //     return (
+  //       <Tabs.TabPane tab={groupTag.name} key={groupTag.name}>
+  //         {groupTag.tags.map((tag: any) => {
+  //           return (
+  //             <Tag.CheckableTag
+  //               key={tag}
+  //               checked={value.indexOf(tag) > -1}
+  //               onChange={(checked) => handleChange(tag, checked)}
+  //             >
+  //               {tag}
+  //             </Tag.CheckableTag>
+  //           );
+  //         })}
+  //       </Tabs.TabPane>
+  //     );
+  //   });
 
   /**
    * 全部选项组视图
@@ -77,8 +77,8 @@ const SelectTags: React.FC<SelectTagsProps> = (props) => {
     allTags &&
     allTags.map((tag) => {
       return (
-        <Option key={tag} value={tag}>
-          {tag}
+        <Option key={tag.key} value={tag.value}>
+          {tag.label}
         </Option>
       );
     });
@@ -89,19 +89,19 @@ const SelectTags: React.FC<SelectTagsProps> = (props) => {
       value={value}
       mode="multiple"
       showSearch
-      dropdownRender={(e) => {
-        return (
-          <>
-            {e.props.searchValue.length > 0 ? (
-              e
-            ) : (
-              <div style={{ paddingLeft: '10px' }}>
-                <Tabs>{groupTagsView}</Tabs>
-              </div>
-            )}
-          </>
-        );
-      }}
+      // dropdownRender={(e) => {
+      //   return (
+      //     <>
+      //       {e?.props?.searchValue?.length && e?.props?.searchValue?.length > 0 ? (
+      //         <div></div>
+      //       ) : (
+      //         <div style={{ paddingLeft: '10px' }}>
+      //           <Tabs>{groupTagsView}</Tabs>
+      //         </div>
+      //       )}
+      //     </>
+      //   );
+      // }}
       onChange={(value1: string[]) => {
         onChange?.(value1);
       }}

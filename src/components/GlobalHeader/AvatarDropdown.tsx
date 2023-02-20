@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BellOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Badge, Dropdown, Menu, Tooltip } from 'antd';
-import type { ConnectProps} from 'umi';
+import type { ConnectProps } from 'umi';
 import { connect, history, Link } from 'umi';
 import type { ConnectState } from '@/models/connect';
 import type { CurrentUser } from '@/models/user';
@@ -19,7 +19,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = (props) => {
   const [unreadMessageNum, setUnreadMessageNum] = useState<number>(0);
 
   const loadData = async () => {
-    const total = 2
+    const total = 2;
     setUnreadMessageNum(total);
   };
 
@@ -81,7 +81,10 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = (props) => {
   );
 
   return currentUser?._id ? (
-    <Dropdown overlayClassName={classNames(styles.container)} overlay={menuHeaderDropdown}>
+    <Dropdown
+      overlayClassName={classNames(styles.container)}
+      overlay={menuHeaderDropdown}
+    >
       <div className={`${styles.action} ${styles.account}`}>
         <Badge count={unreadMessageNum}>
           {currentUser.avatarUrl ? (
@@ -94,7 +97,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = (props) => {
     </Dropdown>
   ) : (
     <Tooltip title="登录后，享用全部功能" placement="bottomLeft" defaultVisible>
-      <Link to="/user/login">
+      <Link to="/login">
         <span className={`${styles.action} ${styles.account}`}>
           <Avatar icon={<UserOutlined />} />
         </span>

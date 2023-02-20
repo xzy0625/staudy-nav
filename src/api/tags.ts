@@ -11,7 +11,8 @@ const getTags = promiseCache(() => {
       const tagsData = await axios(
         'https://json-1300770696.cos.ap-guangzhou.myqcloud.com/tags.json',
       );
-      console.log(tagsData.data, '.......');
+      // 这个data可以是双层结构，大类里面包含小类～
+      // console.log(tagsData.data, '.......');
       // 封装tags之后再返回去
       resolve(configWrap(tagsData?.data || {}));
     } catch (error) {

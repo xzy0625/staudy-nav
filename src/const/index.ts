@@ -1,4 +1,4 @@
-import { IPagination } from './../pages/ToolList/type.d';
+import { IPagination } from '../pages/ToolList/type';
 /**
  * 登录 Cookie 键名
  */

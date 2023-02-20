@@ -13,11 +13,15 @@ const app = getTCBInstance();
 const login = ({
   username,
   password,
+  userId,
+  type,
 }: {
   username: string;
   password: string;
+  userId: string;
+  type: string;
 }): Promise<IAnyObject> => {
-  console.log(username, password, '开始登录');
+  console.log(username, password, userId, type, '开始登录');
   return new Promise((resolve, reject) => {
     try {
       app
@@ -26,14 +30,15 @@ const login = ({
           data: {
             username,
             password,
+            userId,
+            type,
           },
         })
         .then(({ result = {} }: IAnyObject) => {
-          console.log(result, '......登录成功');
           if (result.code !== 0) {
             reject('登录失败，请重试');
           }
-          resolve(result);
+          resolve(result?.data?.[0]);
         });
     } catch (error) {
       reject(error);
