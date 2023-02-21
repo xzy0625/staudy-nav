@@ -61,7 +61,6 @@ export async function searchResources(params: ResourceSearchParams) {
     params.pageNum,
   );
   return query
-    .orderBy(params.orderKey ?? 'publishTime', params.order ?? 'desc')
     .get()
     .then(({ data }: any) => {
       console.log(`searchResources succeed, length = ${data.length}`);
@@ -363,7 +362,10 @@ export async function viewResource(resourceId: string) {
  * @param params
  */
 function getSearchConditions(params: ResourceSearchParams) {
-  const condition: any = { isDelete: false, reviewStatus: params.reviewStatus };
+  const condition: any = {};
+  if (params.reviewStatus) {
+    condition.review_status = params.reviewStatus;
+  }
   if (params._ids) {
     condition._id = _.in(params._ids);
   }
@@ -371,7 +373,7 @@ function getSearchConditions(params: ResourceSearchParams) {
     condition._id = _.neq(params.notId);
   }
   if (params.userId) {
-    condition.userId = params.userId;
+    condition.user_id = params.userId;
   }
   if (params.name) {
     condition.name = {
@@ -380,7 +382,7 @@ function getSearchConditions(params: ResourceSearchParams) {
     };
   }
   if (params.link) {
-    condition.link = params.link;
+    condition.url = params.link;
   }
 
   if (params.tags && params.tags.length > 0) {

@@ -13,6 +13,7 @@ export interface ResourceType {
   icon?: string;
   desc?: string;
   detail?: string;
+  head_img?: string;
   likeNum?: number;
   shareNum?: number;
   tags: string[];
@@ -25,10 +26,12 @@ export interface ResourceType {
   viewNum?: number;
   explain?: string;
   priority?: number;
-  _createTime?: Date;
-  _updateTime?: Date;
+  // _createTime?: Date;
+  // _updateTime?: Date;
   reviewTime?: Date;
   publishTime?: Date;
+  create_time?: number | string;
+  [props: string]: any;
 }
 
 export interface ResourceModelState {

@@ -16,8 +16,8 @@ const login = ({
   userId,
   type,
 }: {
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
   userId: string;
   type: string;
 }): Promise<IAnyObject> => {

@@ -26,7 +26,6 @@ const SimilarResources: React.FC<SimilarResourcesProps> = (props) => {
       searchResources({
         tags: [resource.tags[0]],
         pageSize: 3,
-        reviewStatus: reviewStatusEnum.PASS,
         notId: resource._id,
       })
         .then((res: ResourceType[]) => {

@@ -10,6 +10,7 @@ import {
   Row,
   Tooltip,
 } from 'antd';
+import ImgUpload from '@/components/imgUpload/index';
 import { connect, Dispatch, history } from 'umi';
 import React, { FC, useEffect, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -26,6 +27,7 @@ import { NoAuth } from '@/components/NoAuth';
 import SelectTags from '@/components/SelectTags';
 // import PicUploader from '../../components/PicUploader';
 import './style.less';
+import ResourceCard from '@/components/ResourceCard';
 
 const FormItem = Form.Item;
 
@@ -94,7 +96,9 @@ const AddResource: FC<AddResourceProps> = (props) => {
   const [showSameNameModal, setShowSameNameModal] = useState<boolean>(false);
   const [showSimilarModal, setShowSimilarModal] = useState<boolean>(false);
   const [similarResources, setSimilarResources] = useState<ResourceType[]>([]);
-  const [previewResource, setPreviewResource] = useState<ResourceType>();
+  const [previewResource, setPreviewResource] = useState<ResourceType>(
+    {} as ResourceType,
+  );
   const [disabled, setDisabled] = useState<boolean>(false);
 
   // 修改资源
@@ -124,7 +128,6 @@ const AddResource: FC<AddResourceProps> = (props) => {
     }
     // 同名检测
     const searchParams = {
-      reviewStatus: reviewStatusEnum.PASS,
       name,
       pageSize: 5,
     };
@@ -166,6 +169,8 @@ const AddResource: FC<AddResourceProps> = (props) => {
   };
 
   const onFinish = (values: { [key: string]: any }) => {
+    console.log(values, '..........value');
+
     // 同名检测
     const searchParams = {
       reviewStatus: reviewStatusEnum.PASS,
@@ -173,6 +178,7 @@ const AddResource: FC<AddResourceProps> = (props) => {
       pageSize: 5,
     };
     searchResources(searchParams).then((res) => {
+      console.log(res, '........1111');
       if (!res || res.length === 0) {
         doSubmit(values);
       } else {
@@ -201,6 +207,10 @@ const AddResource: FC<AddResourceProps> = (props) => {
 
   const handleSameNameModalCancel = () => {
     setShowSameNameModal(false);
+  };
+
+  const onChange = (file: IAnyObject) => {
+    console.log(file, '拿到了图片的url嗷');
   };
 
   return currentUser._id ? (
@@ -259,8 +269,8 @@ const AddResource: FC<AddResourceProps> = (props) => {
             ]}
           >
             <Input
-              placeholder="用一句话简单介绍资源，最多 80 字"
-              maxLength={80}
+              placeholder="用一句话简单介绍资源，最多 60 字"
+              maxLength={60}
               allowClear
             />
           </FormItem>
@@ -306,7 +316,7 @@ const AddResource: FC<AddResourceProps> = (props) => {
             name="icon"
             tooltip={{ title: '正方形图标展示效果最佳', placement: 'topLeft' }}
           >
-            {/* <PicUploader /> */}
+            <ImgUpload shape="rect" />
           </FormItem>
           <FormItem label="详情" name="detail">
             <Input.TextArea
@@ -332,21 +342,20 @@ const AddResource: FC<AddResourceProps> = (props) => {
                   {submitting ? '提交中' : '提交'}
                 </Button>
               </Col>
-              {/* <Col span={8}>
+              <Col span={8}>
                 <Tooltip
                   placement="topRight"
                   overlayStyle={{ minWidth: 260 }}
                   title={
                     <ResourceCard
                       resource={previewResource}
-                      loading={!previewResource}
-                      showActions={false}
+                      showMenus={false}
                     />
                   }
                 >
                   <Button>预览</Button>
                 </Tooltip>
-              </Col> */}
+              </Col>
             </Row>
           </FormItem>
         </Form>
@@ -354,20 +363,28 @@ const AddResource: FC<AddResourceProps> = (props) => {
       <Modal
         title="已有相似资源"
         visible={showSameNameModal}
+        width={600}
         footer={null}
         onCancel={handleSameNameModalCancel}
       >
         <List<ResourceType>
           rowKey="_id"
           dataSource={similarResources}
-          pagination={{
-            pageSize: 1,
+          grid={{
+            gutter: 16,
+            xs: 1,
+            sm: 1,
+            md: 1,
+            lg: 2,
+            xl: 2,
+            xxl: 2,
           }}
           split={false}
           renderItem={(item) => {
             return (
               <List.Item key={item._id}>
                 {/* <ResourceCard resource={item} showActions={false} /> */}
+                <ResourceCard currentUser={currentUser} resource={item} />
               </List.Item>
             );
           }}

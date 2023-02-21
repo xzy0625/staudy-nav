@@ -1,20 +1,24 @@
-import type {Effect, Reducer} from 'umi';
+import { likeResource } from '@/services/resource';
+import type { Effect, Reducer } from 'umi';
 
-import {message} from "antd";
+import { message } from 'antd';
 
 export interface CurrentUser {
   _id?: string;
   avatarUrl?: string;
-  nickName?: string;
+  starResourceIds?: string[];
+  likeResourceIds?: string[];
+  nickname?: string;
   gender?: number;
   city?: string;
   province?: string;
   country?: string;
   language?: string;
-  likeResourceIds?: string[];
   interests?: string[];
   score?: number;
   title?: string;
+  head_img?: string;
+  [props: string]: any;
 }
 
 export interface SimpleUser {
@@ -47,8 +51,8 @@ const UserModel: UserModelType = {
   },
 
   effects: {
-    * fetchCurrent({payload}, {call, put}) {
-      const {userId} = payload;
+    *fetchCurrent({ payload }, { call, put }) {
+      const { userId } = payload;
       if (!userId) {
         return;
       }

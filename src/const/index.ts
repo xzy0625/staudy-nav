@@ -39,6 +39,13 @@ export const opType = {
   login: 1,
   modify: 2,
 };
+/**
+ * 登录类型
+ */
+export const LOGIN_TYPE = {
+  CUSTOM: 'custom',
+  AUTO: 'auto',
+};
 
 // 请求根路径
 export const baseUrl = 'http://106.55.178.104:8889/api/';

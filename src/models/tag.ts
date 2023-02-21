@@ -17,6 +17,7 @@ export interface WholeTagsMap {
   groupTags: TagType[];
   userIntroduceGroupTags: GroupTag[];
   categoryTagsMap: categoryTagsMapType;
+  originTags: TagType[];
 }
 
 export interface TagModelState {
@@ -44,6 +45,7 @@ const Model: TagModelType = {
       userIntroduceGroupTags: [],
       allTags: [],
       categoryTagsMap: {},
+      originTags: [],
     },
   },
 
@@ -56,6 +58,7 @@ const Model: TagModelType = {
           type: 'setWholeTagsMap',
           payload: {
             allTags: response.entries(),
+            originTags: response,
           },
         });
       } else {

@@ -40,6 +40,10 @@ export default defineConfig({
               authority: ['user', 'admin'],
             },
             {
+              path: '/resourseDetail',
+              component: '@/pages/ResourceDetail/index',
+            },
+            {
               path: '/',
               redirect: '/toolList',
               component: './ToolList',
@@ -67,6 +71,12 @@ export default defineConfig({
       path: '*',
       component: './404',
     },
+  ],
+  // postCSS插件
+  extraPostCSSPlugins: [
+    require('tailwindcss')({
+      config: './tailwind.config.ts',
+    }),
   ],
   fastRefresh: {},
   antd: {},
