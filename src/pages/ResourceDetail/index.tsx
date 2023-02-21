@@ -4,7 +4,7 @@ import { ConnectState } from '@/models/connect';
 import { searchResources } from '@/services/resource';
 import { UserOutlined } from '@ant-design/icons';
 import { GridContent } from '@ant-design/pro-layout';
-import { Avatar, Card, Col, message, Row, Tag } from 'antd';
+import { Avatar, Card, Col, Divider, message, Row, Tag } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { connect, CurrentUser, ResourceType, UserModelType } from 'umi';
@@ -62,20 +62,31 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
     initResource();
   }, []);
 
+  const avatorTime = (
+    <div>
+      <span>
+        {moment(resource.create_time as number).format('YYYY-MM-DD HH:MM')}
+      </span>
+      <span style={{ margin: '0 10px' }}>
+        <Divider type="vertical" />
+      </span>
+      <span>阅读: 1231</span>
+    </div>
+  );
+
   return (
     <div style={{ padding: '0 30px' }}>
       <GridContent>
         <Row gutter={24}>
           <Col span={26} xl={16} lg={16} xs={16}>
-            <Card title="相似资源">
+            <Card>
               <Card.Meta
-                avatar={<Avatar size="small" src={resource?.head_img} />}
+                avatar={<Avatar size="large" src={resource?.head_img} />}
                 title={resource?.name}
-                description={moment
-                  .unix(resource.create_time as number)
-                  .format('YYYY-MM-DD HH:MM')}
+                description={avatorTime}
               />
               {/* <SimilarResources resource={resource} /> */}
+              <Divider />
               相似资源
             </Card>
           </Col>
@@ -110,7 +121,7 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
                 <span>标签：</span>
                 <div className={styles.desc}>
                   {resource?.tags?.map((item) => (
-                    <Tag>{originTags?.getLabel(item) || '--'}</Tag>
+                    <Tag>{originTags?.getLabel?.(item) || '--'}</Tag>
                   ))}
                 </div>
               </div>
