@@ -26,8 +26,6 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
     {} as CurrentUser,
   );
 
-  // console.log(query,originTags, '.......');
-
   // 获取这个资源的发布人
   const getResourceUserInfo = async () => {
     const { user_id } = resource;
@@ -75,10 +73,10 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
   );
 
   return (
-    <div style={{ padding: '0 30px' }}>
+    <div style={{ padding: '0 180px' }}>
       <GridContent>
         <Row gutter={24}>
-          <Col span={26} xl={16} lg={16} xs={16}>
+          <Col span={18} xl={17} lg={17} xs={17}>
             <Card>
               <Card.Meta
                 avatar={<Avatar size="large" src={resource?.head_img} />}
@@ -90,7 +88,7 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
               相似资源
             </Card>
           </Col>
-          <Col span={8} xl={8} lg={8} xs={8}>
+          <Col span={6} xl={7} lg={7} xs={7}>
             <Card title="帖子信息" hoverable>
               <div className={styles.resourceInfo}>
                 <span>发布者头像：</span>
