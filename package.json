@@ -36,6 +36,7 @@
     "copy-to-clipboard": "^3.3.3",
     "dotenv": "^16.0.3",
     "dva": "2.4.1",
+    "for-editor": "^0.3.5",
     "js-cookie": "2.2.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",

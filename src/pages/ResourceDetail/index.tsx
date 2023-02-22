@@ -1,10 +1,12 @@
 import login from '@/api/account/login';
-import { LOGIN_TYPE } from '@/const';
+import MarkdownEditor from '@/components/MarkdownEditor';
+import PreviewAvator from '@/components/PreviewAvator';
+import { LOGIN_TYPE, RESOURCE_TAB_TYPE } from '@/const';
 import { ConnectState } from '@/models/connect';
 import { searchResources } from '@/services/resource';
 import { UserOutlined } from '@ant-design/icons';
 import { GridContent } from '@ant-design/pro-layout';
-import { Avatar, Card, Col, Divider, message, Row, Tag } from 'antd';
+import { Avatar, Button, Card, Col, Divider, message, Row, Tag } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { connect, CurrentUser, ResourceType, UserModelType } from 'umi';
@@ -14,10 +16,23 @@ interface IProps {
   [props: string]: any;
 }
 
+// 标签页tabs
+const tabList = [
+  {
+    key: RESOURCE_TAB_TYPE.COMMENT,
+    tab: '评论',
+  },
+  {
+    key: RESOURCE_TAB_TYPE.RELATE,
+    tab: '相关内容',
+  },
+];
+
 const ResourceDetail: React.FC<IProps> = (props: IProps) => {
   const {
     location: { query },
     wholeTagsMap,
+    currentUser,
   } = props;
   const { originTags } = wholeTagsMap;
 
@@ -25,6 +40,7 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
   const [resourceUserInfo, setResourceUserInfo] = useState<CurrentUser>(
     {} as CurrentUser,
   );
+  const [activeTabKey, setActiveTabKey] = useState(tabList[0].key);
 
   // 获取这个资源的发布人
   const getResourceUserInfo = async () => {
@@ -72,6 +88,41 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
     </div>
   );
 
+  // 评论组件
+  const commentComp = (
+    <div>
+      <h2>{26} 条评论</h2>
+      <Divider />
+      <div className={styles.comment}>
+        <PreviewAvator src={currentUser.head_img} alt="头像" size="large" />
+        <div style={{ marginLeft: '20px', width: '100%' }}>
+          <MarkdownEditor
+            placeholder="请输入友善的评论吧，全屏编辑体验更好哦！"
+            style={{ width: '100%' }}
+          />
+          <Button size="middle" type="primary" style={{ marginTop: '6px' }}>
+            发布评论
+          </Button>
+        </div>
+      </div>
+      <Divider />
+      <div>评论列表</div>
+    </div>
+  );
+
+  // 相似资源
+  const relateComp = <div>相似资源</div>;
+
+  // map
+  const keyMap = {
+    [RESOURCE_TAB_TYPE.COMMENT]: commentComp,
+    [RESOURCE_TAB_TYPE.RELATE]: relateComp,
+  };
+
+  const onTabChange = (value: string) => {
+    setActiveTabKey(value);
+  };
+
   return (
     <div style={{ padding: '0 180px' }}>
       <GridContent>
@@ -79,22 +130,33 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
           <Col span={18} xl={17} lg={17} xs={17}>
             <Card>
               <Card.Meta
-                avatar={<Avatar size="large" src={resource?.head_img} />}
+                avatar={<PreviewAvator size="large" src={resource?.head_img} />}
                 title={resource?.name}
                 description={avatorTime}
               />
               {/* <SimilarResources resource={resource} /> */}
               <Divider />
               相似资源
+              <Divider />
+            </Card>
+            <Card
+              style={{ width: '100%', marginTop: '30px' }}
+              tabList={tabList}
+              activeTabKey={activeTabKey}
+              onTabChange={onTabChange}
+            >
+              {keyMap[activeTabKey]}
             </Card>
           </Col>
+
+          {/* 右侧组件 */}
           <Col span={6} xl={7} lg={7} xs={7}>
             <Card title="帖子信息" hoverable>
               <div className={styles.resourceInfo}>
                 <span>发布者头像：</span>
                 {/* 这里后续可以加上大类 */}
                 <div className={styles.desc}>
-                  <Avatar
+                  <PreviewAvator
                     size="large"
                     icon={<UserOutlined />}
                     alt="头像"

@@ -47,6 +47,16 @@ export const LOGIN_TYPE = {
   AUTO: 'auto',
 };
 
+/**
+ * tab类型
+ */
+export const COMMENT = 'comment';
+export const RELATE = 'relate';
+export const RESOURCE_TAB_TYPE = {
+  COMMENT,
+  RELATE,
+};
+
 // 请求根路径
 export const baseUrl = 'http://106.55.178.104:8889/api/';
 
