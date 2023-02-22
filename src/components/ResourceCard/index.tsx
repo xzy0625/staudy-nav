@@ -8,8 +8,7 @@ import {
   StarOutlined,
 } from '@ant-design/icons';
 import { Card, Tooltip, Avatar, Dropdown, Menu, message, Tag } from 'antd';
-import { ResourceType, CurrentUser } from 'umi';
-import { history } from '@@/core/history';
+import { ResourceType, CurrentUser, history } from 'umi';
 import numeral from 'numeral';
 import styles from '../../pages/ToolList/style.less';
 import { useEffect, useState } from 'react';
@@ -36,9 +35,9 @@ const ResourceCard: React.FC<IProps> = ({
     }
     // 修改资源，携带资源的ID
     history.push({
-      pathname: '/',
+      pathname: '/addResource',
       query: {
-        resourceId: resource._id,
+        id: resource._id,
       },
     });
   };
@@ -91,39 +90,51 @@ const ResourceCard: React.FC<IProps> = ({
     </>
   );
 
+  const onClick = () => {
+    console.log(11111);
+    history.push({
+      pathname: '/resourseDetail',
+      query: {
+        id: resource._id,
+      },
+    });
+  };
+
   return (
-    <Card
-      hoverable
-      bodyStyle={{ paddingBottom: 20 }}
-      actions={[
-        <Tooltip key="download" title="点赞">
-          <LikeOutlined />
-        </Tooltip>,
-        <Tooltip key="edit" title="收藏">
-          <StarOutlined />
-        </Tooltip>,
-        <Tooltip title="分享" key="share">
-          <ShareAltOutlined />
-        </Tooltip>,
-        showMenus && (
-          <Dropdown key="ellipsis" overlay={itemMenu}>
-            <EllipsisOutlined />
-          </Dropdown>
-        ),
-      ].filter(Boolean)}
-    >
-      <Card.Meta
-        avatar={<Avatar size="small" src={resource.head_img} />}
-        title={resource.name}
-        description={resource.desc}
-      />
-      <div className={styles.cardItemContent}>
-        <CardInfo
-          activeUser={formatWan(1000)}
-          newUser={numeral(2000).format('0,0')}
+    <div>
+      <Card
+        hoverable
+        bodyStyle={{ paddingBottom: 20 }}
+        actions={[
+          <Tooltip key="download" title="点赞">
+            <LikeOutlined />
+          </Tooltip>,
+          <Tooltip key="edit" title="收藏">
+            <StarOutlined />
+          </Tooltip>,
+          <Tooltip title="分享" key="share">
+            <ShareAltOutlined />
+          </Tooltip>,
+          showMenus && (
+            <Dropdown key="ellipsis" overlay={itemMenu}>
+              <EllipsisOutlined />
+            </Dropdown>
+          ),
+        ].filter(Boolean)}
+      >
+        <Card.Meta
+          avatar={<Avatar size="small" src={resource.head_img} />}
+          title={resource.name}
+          description={resource.desc}
         />
-      </div>
-    </Card>
+        <div className={styles.cardItemContent} onClick={onClick}>
+          <CardInfo
+            activeUser={formatWan(1000)}
+            newUser={numeral(2000).format('0,0')}
+          />
+        </div>
+      </Card>
+    </div>
   );
 };
 

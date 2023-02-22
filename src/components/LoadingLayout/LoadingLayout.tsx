@@ -74,14 +74,3 @@ const LoadingLayout: React.FC<LoadingLayoutProps> = (props) => {
 export default connect(({ login }: ConnectState) => ({
   userId: login.userId,
 }))(LoadingLayout);
-
-// const LoadingLayout = (props) => {
-//   const { children, dispatch, userId, location = { query: {} } } = props;
-//   const [ss, set] = useState(false);
-//   setTimeout(() => {
-//     set(true);
-//   }, 500);
-//   return ss ? <>{children}</> : <>11111</>;
-// };
-
-// export default LoadingLayout;

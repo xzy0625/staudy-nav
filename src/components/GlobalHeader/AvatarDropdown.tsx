@@ -18,9 +18,9 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = (props) => {
   const { currentUser, location, dispatch } = props;
   const [unreadMessageNum, setUnreadMessageNum] = useState<number>(0);
 
+  const total = 2;
   const loadData = async () => {
-    const total = 2;
-    setUnreadMessageNum(total);
+    // setUnreadMessageNum(total);
   };
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = (props) => {
     const { key } = event;
 
     const keyPathMap = {
-      home: '/account/info',
+      accountsettings: '/accountsettings',
       message: '/account/message',
     };
 
@@ -62,7 +62,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = (props) => {
    */
   const menuHeaderDropdown = (
     <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
-      <Menu.Item key="home">
+      <Menu.Item key="accountsettings">
         <UserOutlined />
         个人中心
       </Menu.Item>
@@ -87,8 +87,8 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = (props) => {
     >
       <div className={`${styles.action} ${styles.account}`}>
         <Badge count={unreadMessageNum}>
-          {currentUser.avatarUrl ? (
-            <Avatar className={styles.avatar} src={currentUser.avatarUrl} />
+          {currentUser.head_img ? (
+            <Avatar className={styles.avatar} src={currentUser.head_img} />
           ) : (
             <Avatar>无</Avatar>
           )}

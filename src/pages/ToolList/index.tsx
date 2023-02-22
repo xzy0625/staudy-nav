@@ -21,7 +21,7 @@ import {
 import numeral from 'numeral';
 import { FC, useEffect, useState } from 'react';
 import React from 'react';
-import { useRequest } from 'umi';
+import { ResourceType, useRequest } from 'umi';
 import StandardFormRow from './components/StandardFormRow';
 import TagSelect from './components/TagSelect';
 import type { IPagination, ListItemDataType } from './type';
@@ -29,6 +29,11 @@ import { queryFakeList } from './service';
 import styles from './style.less';
 import getTags from '@/api/tags';
 import { defaultPagination } from '@/const';
+import ResourceCard from '@/components/ResourceCard';
+import {
+  ResourceSearchParams,
+  searchResourcesByPage,
+} from '../../services/resource';
 
 const { Option } = Select;
 
@@ -87,35 +92,13 @@ export const ToolList: FC<Record<string, any>> = () => {
   // 分页数据
   const [pagination, setPagination]: [IPagination, any] =
     useState(defaultPagination);
-
-  const { data, loading, run } = useRequest((values: any) => {
-    console.log('form data', values);
-    return queryFakeList({
-      count: 12,
-    });
-  });
-
-  const list = data?.list || [];
-
-  // const itemMenu = (
-  //   <Menu>
-  //     <Menu.Item>
-  //       <a target="_blank" rel="noopener noreferrer" href="https://www.alipay.com/">
-  //         1st menu item
-  //       </a>
-  //     </Menu.Item>
-  //     <Menu.Item>
-  //       <a target="_blank" rel="noopener noreferrer" href="https://www.taobao.com/">
-  //         2nd menu item
-  //       </a>
-  //     </Menu.Item>
-  //     <Menu.Item>
-  //       <a target="_blank" rel="noopener noreferrer" href="https://www.tmall.com/">
-  //         3d menu item
-  //       </a>
-  //     </Menu.Item>
-  //   </Menu>
-  // );
+  // 是否在加载
+  const [loading, setLoading] = useState<boolean>(false);
+  // 资源数据
+  const [resourceData, setResourceData] = useState<ResourceType[]>(
+    [] as ResourceType[],
+  );
+  const [total, setTotal] = useState(0);
 
   // 初始化标签数据
   const initTags = async () => {
@@ -128,19 +111,45 @@ export const ToolList: FC<Record<string, any>> = () => {
   };
 
   // 获取列表数据
-  const getListData = () => {
-    const { page, pagesize } = pagination;
+  const getListData = async (condition: ResourceSearchParams) => {
+    setLoading(true);
+    try {
+      const data = await searchResourcesByPage(condition);
+      setResourceData(data?.data || []);
+      setTotal(data.total ?? 0);
+    } catch (error) {
+      message.error('获取资源数据失败，请刷新后再重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onPaginationChange = (
     page: IPagination['page'],
-    pagesize: IPagination['pageSize'],
+    pageSize: IPagination['pageSize'],
   ) => {
-    console.log(page, pagesize, '......changee');
+    setPagination({
+      page,
+      pageSize,
+    });
+    getListData({ pageNum: page, pageSize });
   };
+
+  // 选了标签之后需要重新拉取数据
+  const onValuesChange = (value: any) => {
+    console.log('ssssss');
+    setPagination({ ...pagination, page: 1 });
+    getListData({
+      pageNum: 1,
+      pageSize: pagination.pageSize,
+      tags: value.category.length === tags.length ? [] : value.category,
+    });
+  };
+
   // 初始化数据
   useEffect(() => {
     initTags();
+    getListData({});
   }, []);
 
   return (
@@ -148,7 +157,7 @@ export const ToolList: FC<Record<string, any>> = () => {
       <Card bordered={false}>
         <Form
           onValuesChange={(_, values) => {
-            run(values);
+            onValuesChange(values);
           }}
         >
           <StandardFormRow title="所属类目" block style={{ paddingBottom: 11 }}>
@@ -168,7 +177,7 @@ export const ToolList: FC<Record<string, any>> = () => {
         </Form>
       </Card>
       <br />
-      <List<ListItemDataType>
+      <List<ResourceType>
         rowKey="id"
         grid={{
           gutter: 16,
@@ -180,48 +189,21 @@ export const ToolList: FC<Record<string, any>> = () => {
           xxl: 4,
         }}
         loading={loading}
-        dataSource={list}
+        dataSource={resourceData}
         renderItem={(item) => (
           <List.Item key={item.id}>
-            <Card
-              hoverable
-              bodyStyle={{ paddingBottom: 20 }}
-              actions={[
-                <Tooltip key="download" title="下载">
-                  <DownloadOutlined />
-                </Tooltip>,
-                <Tooltip key="edit" title="编辑">
-                  <EditOutlined />
-                </Tooltip>,
-                <Tooltip title="分享" key="share">
-                  <ShareAltOutlined />
-                </Tooltip>,
-                // <Dropdown key="ellipsis" overlay={itemMenu}>
-                //   <EllipsisOutlined />
-                // </Dropdown>,
-              ]}
-            >
-              <Card.Meta
-                avatar={<Avatar size="small" src={item.avatar} />}
-                title={item.title}
-              />
-              <div className={styles.cardItemContent}>
-                <CardInfo
-                  activeUser={formatWan(item.activeUser)}
-                  newUser={numeral(item.newUser).format('0,0')}
-                />
-              </div>
-            </Card>
+            <ResourceCard resource={item} />
           </List.Item>
         )}
       />
       <div className={styles.pagination}>
         <Pagination
-          total={85}
-          showTotal={(total = 100) => `共 ${total} 条资源`}
+          total={total}
+          showTotal={(total = total) => `共 ${total} 条资源`}
           defaultPageSize={pagination.pageSize}
-          defaultCurrent={pagination.page}
           onChange={onPaginationChange}
+          current={pagination.page}
+          showSizeChanger
           pageSizeOptions={[12, 16, 24, 36, 44]}
         />
       </div>

@@ -21,7 +21,7 @@ export interface ResourceSearchParams {
   pageNum?: number;
   orderKey?: string;
   order?: string;
-  link?: string;
+  url?: string;
 }
 
 /**
@@ -94,7 +94,6 @@ export async function searchResourcesByPage(params: ResourceSearchParams) {
 
   const query = wrapPageQuery(collection.where(condition), pageSize, pageNum);
   return query
-    .orderBy(params.orderKey ?? 'publishTime', params.order ?? 'desc')
     .get()
     .then(({ data }: any) => {
       console.log(
@@ -387,8 +386,8 @@ function getSearchConditions(params: ResourceSearchParams) {
       $options: 'i',
     };
   }
-  if (params.link) {
-    condition.url = params.link;
+  if (params.url) {
+    condition.url = params.url;
   }
 
   if (params.tags && params.tags.length > 0) {
