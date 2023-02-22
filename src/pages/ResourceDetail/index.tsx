@@ -98,7 +98,7 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
         <div style={{ marginLeft: '20px', width: '100%' }}>
           <MarkdownEditor
             placeholder="请输入友善的评论吧，全屏编辑体验更好哦！"
-            style={{ width: '100%' }}
+            style={{ width: '100%', boxShadow: 'rgb(0 0 0 ) 0px 0px 0px' }}
           />
           <Button size="middle" type="primary" style={{ marginTop: '6px' }}>
             发布评论
