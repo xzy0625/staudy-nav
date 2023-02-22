@@ -36,6 +36,7 @@ interface AddResourceProps {
   dispatch: Dispatch;
   wholeTagsMap: WholeTagsMap;
   currentUser?: CurrentUser;
+  location?: IAnyObject;
 }
 
 const formItemLayout = {
@@ -89,9 +90,14 @@ const submitFormLayout = {
  * @constructor
  */
 const AddResource: FC<AddResourceProps> = (props) => {
-  const { submitting, wholeTagsMap, currentUser = {} as CurrentUser } = props;
+  const {
+    submitting,
+    wholeTagsMap,
+    currentUser = {} as CurrentUser,
+    location,
+  } = props;
+  const resourceId = location?.query?.id;
   const [form] = Form.useForm();
-  const resourceId = history.location.query?.rid as string;
   // 相似检测
   const [showSameNameModal, setShowSameNameModal] = useState<boolean>(false);
   const [showSimilarModal, setShowSimilarModal] = useState<boolean>(false);
@@ -100,22 +106,25 @@ const AddResource: FC<AddResourceProps> = (props) => {
     {} as ResourceType,
   );
   const [disabled, setDisabled] = useState<boolean>(false);
+  const initialValues = {};
 
-  // 修改资源
+  // 修改资源要获取资源的信息
   useEffect(() => {
     if (currentUser._id && resourceId) {
-      getResource(resourceId)?.then((res) => {
+      searchResources({ _ids: [resourceId] })?.then((resData) => {
+        const res = resData?.[0] || {};
         if (!res) {
           message.error('加载失败，请刷新重试');
           return;
         }
-        if (res.userId !== currentUser._id) {
+        if (res.user_id !== currentUser._id) {
           message.error('只能修改自己的资源哦');
           setDisabled(true);
           return;
         }
-        setPreviewResource(res);
-        form.setFieldsValue(res);
+        const { name, desc, url, head_img, tags, detail } = res;
+        form.setFieldsValue({ name, desc, url, head_img, tags, detail });
+        setPreviewResource({ name, desc, url, head_img, tags, detail });
       });
     }
   }, [resourceId, currentUser]);
@@ -132,10 +141,13 @@ const AddResource: FC<AddResourceProps> = (props) => {
       pageSize: 5,
     };
     searchResources(searchParams).then((res) => {
-      if (!res || res.length === 0) {
+      const similarResourcesData = res?.filter(
+        (item: ResourceType) => item._id !== resourceId,
+      );
+      if (!similarResourcesData || similarResourcesData.length === 0) {
         message.success('未发现重复资源');
       } else {
-        setSimilarResources(res);
+        setSimilarResources(similarResourcesData);
         setShowSameNameModal(true);
       }
     });
@@ -145,8 +157,12 @@ const AddResource: FC<AddResourceProps> = (props) => {
       message.error('提交失败，请刷新页面重试！');
       return;
     }
-    values.userId = currentUser._id;
-    values.reviewStatus = reviewStatusEnum.REVIEWING;
+
+    const sbmitValues = {
+      ...values,
+      user_id: currentUser._id,
+      review_status: reviewStatusEnum.REVIEWING,
+    };
 
     const { dispatch } = props;
     // 修改
@@ -155,8 +171,8 @@ const AddResource: FC<AddResourceProps> = (props) => {
         type: 'resource/update',
         payload: {
           resourceId,
-          resource: values,
-          userId: currentUser._id,
+          resource: sbmitValues,
+          user_id: currentUser._id,
         },
       });
       return;
@@ -164,25 +180,24 @@ const AddResource: FC<AddResourceProps> = (props) => {
     // 新增
     dispatch({
       type: 'resource/add',
-      payload: values,
+      payload: sbmitValues,
     });
   };
 
   const onFinish = (values: { [key: string]: any }) => {
-    console.log(values, '..........value');
-
     // 同名检测
     const searchParams = {
-      reviewStatus: reviewStatusEnum.PASS,
       name: values.name,
       pageSize: 5,
     };
     searchResources(searchParams).then((res) => {
-      console.log(res, '........1111');
-      if (!res || res.length === 0) {
+      const similarResourcesData = res.filter(
+        (res: ResourceType) => res._id !== resourceId,
+      );
+      if (!similarResourcesData || similarResourcesData.length === 0) {
         doSubmit(values);
       } else {
-        setSimilarResources(res);
+        setSimilarResources(similarResourcesData);
         setShowSimilarModal(true);
       }
     });
@@ -209,14 +224,10 @@ const AddResource: FC<AddResourceProps> = (props) => {
     setShowSameNameModal(false);
   };
 
-  const onChange = (file: IAnyObject) => {
-    console.log(file, '拿到了图片的url嗷');
-  };
-
   return currentUser._id ? (
     <PageContainer
       title="我要推荐"
-      content={<span>欢迎推荐优质编程资源，共建繁荣学习社区</span>}
+      content={<span>欢迎推荐优质学习资源，共建繁荣学习社区</span>}
     >
       <Card bordered={false}>
         <Form
@@ -276,7 +287,7 @@ const AddResource: FC<AddResourceProps> = (props) => {
           </FormItem>
           <FormItem
             label="链接"
-            name="link"
+            name="url"
             rules={[
               {
                 required: true,
@@ -313,7 +324,7 @@ const AddResource: FC<AddResourceProps> = (props) => {
           </FormItem>
           <FormItem
             label="图标"
-            name="icon"
+            name="head_img"
             tooltip={{ title: '正方形图标展示效果最佳', placement: 'topLeft' }}
           >
             <ImgUpload shape="rect" />
@@ -383,7 +394,6 @@ const AddResource: FC<AddResourceProps> = (props) => {
           renderItem={(item) => {
             return (
               <List.Item key={item._id}>
-                {/* <ResourceCard resource={item} showActions={false} /> */}
                 <ResourceCard currentUser={currentUser} resource={item} />
               </List.Item>
             );
@@ -407,7 +417,7 @@ const AddResource: FC<AddResourceProps> = (props) => {
           renderItem={(item) => {
             return (
               <List.Item key={item._id}>
-                {/* <ResourceCard resource={item} showActions={false} /> */}
+                <ResourceCard currentUser={currentUser} resource={item} />
               </List.Item>
             );
           }}

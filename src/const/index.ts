@@ -48,6 +48,14 @@ export const LOGIN_TYPE = {
 };
 
 /**
+ * resourceType
+ */
+export const RESOURCE_TYPE = {
+  MODIFY: 'modify',
+  ADD: 'add',
+};
+
+/**
  * tab类型
  */
 export const COMMENT = 'comment';

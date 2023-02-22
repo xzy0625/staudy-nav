@@ -44,6 +44,10 @@ export default defineConfig({
               component: '@/pages/ResourceDetail/index',
             },
             {
+              path: '/success',
+              component: '@/pages/Sucessed/index',
+            },
+            {
               path: '/',
               redirect: '/toolList',
               component: './ToolList',

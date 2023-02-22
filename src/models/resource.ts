@@ -8,7 +8,7 @@ import {
 import { message } from 'antd';
 
 export interface ResourceType {
-  _id: string;
+  _id?: string;
   name?: string;
   icon?: string;
   desc?: string;
@@ -18,16 +18,14 @@ export interface ResourceType {
   shareNum?: number;
   tags: string[];
   link?: string;
-  reviewStatus: number;
+  reviewStatus?: number;
   reviewMessage?: string;
-  userId?: string;
+  user_id?: string;
   rate?: number;
   rateNum?: number;
   viewNum?: number;
   explain?: string;
   priority?: number;
-  // _createTime?: Date;
-  // _updateTime?: Date;
   reviewTime?: Date;
   publishTime?: Date;
   create_time?: number | string;
@@ -69,12 +67,14 @@ const Model: ResourceModelType = {
     *add({ payload }, { call }) {
       const rid = yield call(addResource, payload);
       if (rid) {
-        history.replace({
-          pathname: '/addSucceed',
-          query: {
-            rid,
-          },
-        });
+        setTimeout(() => {
+          history.replace({
+            pathname: '/success',
+            query: {
+              id: rid,
+            },
+          });
+        }, 1000);
       } else {
         message.error('提交失败，请刷新页面重试！');
       }
@@ -86,12 +86,14 @@ const Model: ResourceModelType = {
         payload.resource,
       );
       if (res) {
-        history.replace({
-          pathname: '/addSucceed',
-          query: {
-            rid: payload.resourceId,
-          },
-        });
+        setTimeout(() => {
+          history.replace({
+            pathname: '/success',
+            query: {
+              id: payload.resourceId,
+            },
+          });
+        }, 1000);
       } else {
         message.error('修改失败，请刷新页面重试！');
       }

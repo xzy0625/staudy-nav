@@ -16,7 +16,7 @@ export interface ResourceSearchParams {
   name?: string;
   tags?: string[];
   reviewStatus?: number;
-  userId?: string;
+  user_id?: string;
   pageSize?: number;
   pageNum?: number;
   orderKey?: string;
@@ -30,7 +30,7 @@ export interface ResourceSearchParams {
  * @return 资源 id
  */
 export function addResource(params: ResourceType) {
-  if (!params.userId || !params.tags || params.tags.length < 1) {
+  if (!params.user_id || !params.tags || params.tags.length < 1) {
     return false;
   }
 
@@ -40,8 +40,11 @@ export function addResource(params: ResourceType) {
       data: params,
     })
     .then((res: any) => {
+      if (res?.result?.code === 0) {
+        return res?.result?.data?.id;
+      }
       console.log(`addResource succeed`, res);
-      return res.result;
+      return false;
     })
     .catch((e: any) => {
       console.error(`addResource error`, e);
@@ -234,8 +237,11 @@ export async function updateResource(
       },
     })
     .then((res: any) => {
-      console.log(`updateResource succeed, id = ${resourceId}`, res);
-      return true;
+      if (res?.result?.code === 0) {
+        console.log(`updateResource succeed, id = ${resourceId}`, res);
+        return true;
+      }
+      return false;
     })
     .catch((e: any) => {
       console.error(`updateResource error, id = ${resourceId}`, e);
@@ -372,8 +378,8 @@ function getSearchConditions(params: ResourceSearchParams) {
   if (params.notId) {
     condition._id = _.neq(params.notId);
   }
-  if (params.userId) {
-    condition.user_id = params.userId;
+  if (params.user_id) {
+    condition.user_id = params.user_id;
   }
   if (params.name) {
     condition.name = {
