@@ -57,6 +57,8 @@ const ResourceCard: React.FC<IProps> = ({
     .currentUser as CurrentUser;
   // 渲染用
   const [count, setCount] = useState(0);
+  const [staring, setStaring] = useState(false);
+  const [liking, setLiking] = useState(false);
   const { _id } = currentUser;
   const [tags, setTags] = useState<any>({});
 
@@ -133,7 +135,10 @@ const ResourceCard: React.FC<IProps> = ({
 
   // 喜欢资源
   const onLikeResourceClick = async () => {
-    console.log(resource.likeNum, '????????');
+    if (liking) {
+      return;
+    }
+    setLiking(true);
     if (!resource._id) {
       message.error('这个资源似乎有点儿问题嗷');
       return;
@@ -171,10 +176,15 @@ const ResourceCard: React.FC<IProps> = ({
     } else {
       message.error('操作失败');
     }
+    setLiking(false);
   };
 
   // 收藏资源，，感觉这里也可以弄成一个方法，和上面重复了
   const onStarResourceClick = async () => {
+    if (staring) {
+      return;
+    }
+    setStaring(true);
     if (!resource._id) {
       message.error('这个资源似乎有点儿问题嗷');
       return;
@@ -212,6 +222,8 @@ const ResourceCard: React.FC<IProps> = ({
     } else {
       message.error('操作失败');
     }
+
+    setStaring(false);
   };
 
   const onShareClick = () => {
@@ -272,11 +284,13 @@ const ResourceCard: React.FC<IProps> = ({
           ),
         ].filter(Boolean)}
       >
-        <Card.Meta
-          avatar={<Avatar size="small" src={resource.head_img} />}
-          title={resource.name}
-          description={resource.desc}
-        />
+        <div onClick={onClick}>
+          <Card.Meta
+            avatar={<Avatar size="small" src={resource.head_img} />}
+            title={resource.name}
+            description={resource.desc}
+          />
+        </div>
         <div className={styles.cardItemContent} onClick={onClick}>
           <CardInfo
             activeUser={numeral(resource.likeNum).format('0,0')}

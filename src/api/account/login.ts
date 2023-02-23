@@ -21,7 +21,7 @@ const login = ({
   userId: string;
   type: string;
 }): Promise<IAnyObject> => {
-  console.log(username, password, userId, type, '开始登录');
+  // console.log(username, password, userId, type, '开始登录');
   return new Promise((resolve, reject) => {
     try {
       app
