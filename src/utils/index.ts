@@ -1,3 +1,4 @@
+import { WEB_HOST } from '@/const';
 import { ResourceType } from '@/models/resource';
 import { addShareNum } from '@/services/resource';
 import { message } from 'antd';
@@ -81,9 +82,8 @@ export const doShare = async (resource?: ResourceType) => {
   // 复制到剪切板，分享数 +1
   if (resource && resource._id) {
     copy(
-      `我在编程导航发现了『 ${resource.name} 』💎 快来看看 ${WEB_HOST}/rd/?rid=${resource._id}`,
+      `我在学习导航发现了『 ${resource.name} 』💎 快来看看 ${WEB_HOST}/resourseDetail/?id=${resource._id}`,
     );
-    addShareNum(resource._id);
     message.success('链接已复制，感谢分享！');
   }
 };

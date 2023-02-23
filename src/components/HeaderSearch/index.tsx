@@ -1,5 +1,5 @@
 import { AutoComplete, Input, Modal, Space } from 'antd';
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { history } from '@@/core/history';
 import { CloseOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
@@ -17,19 +17,38 @@ export type HeaderSearchProps = {
   value?: string;
   style?: CSSProperties;
   placeholder?: string;
+  [porps: string]: any;
 };
 
 const HeaderSearch: React.FC<HeaderSearchProps> = (props) => {
-  const { style, placeholder } = props;
-  const [searchHistoryList, setSearchHistoryList] = useState<string[]>(listSearchHistory());
+  const { style, placeholder, location, value = '' } = props;
+  const [searchHistoryList, setSearchHistoryList] = useState<string[]>(
+    listSearchHistory(),
+  );
+  const [searchValue, setSearchValue] = useState(value);
+
+  useEffect(() => {
+    if (history?.location?.query?.q) {
+      // 这里不更新？？ 很怪
+      setSearchValue(history?.location?.query?.q as string);
+    }
+  }, [history?.location?.query?.q]);
 
   const handleSearch = (value: string) => {
-    history.push({
-      pathname: '/resources/',
+    if (history.location.pathname !== '/searchResource') {
+      history.push({
+        pathname: '/searchResource',
+        query: {
+          q: value,
+        },
+      });
+    }
+    history.replace({
       query: {
         q: value,
       },
     });
+    setSearchValue(value);
     addSearchHistory(value);
     setSearchHistoryList(listSearchHistory());
   };
@@ -54,7 +73,10 @@ const HeaderSearch: React.FC<HeaderSearchProps> = (props) => {
    * @param e
    * @param text
    */
-  const delSearchHistory = (e: React.MouseEvent<HTMLAnchorElement>, text: string) => {
+  const delSearchHistory = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    text: string,
+  ) => {
     deleteSearchHistory(text);
     setSearchHistoryList(listSearchHistory());
     e.stopPropagation();
@@ -109,7 +131,13 @@ const HeaderSearch: React.FC<HeaderSearchProps> = (props) => {
   return (
     <div className={styles.headerSearch} style={style}>
       <AutoComplete options={options} style={{ width: '100%' }}>
-        <Input.Search placeholder={placeholder} size="large" enterButton onSearch={handleSearch} />
+        <Input.Search
+          value={searchValue}
+          placeholder={placeholder}
+          size="large"
+          enterButton
+          onSearch={handleSearch}
+        />
       </AutoComplete>
     </div>
   );

@@ -223,7 +223,8 @@ export async function updateResource(
   resourceId: string,
   resource: Partial<ResourceType>,
 ) {
-  if (!resourceId || !resource || !resource.tags || resource.tags.length < 1) {
+  console.log(resource, resourceId, 'resource....');
+  if (!resourceId || !resource) {
     return false;
   }
 

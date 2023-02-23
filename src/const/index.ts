@@ -13,7 +13,7 @@ export const DYNAMIC_CAPTCHA = 'dc';
  * 网站域名
  * @type {string}
  */
-export const WEB_HOST = 'https://www.code-nav.cn';
+export const WEB_HOST = 'https://www.resource.zyxiong.com';
 
 /**
  * 云函数请求域名

@@ -21,7 +21,7 @@ export interface ResourceType {
   reviewStatus?: number;
   reviewMessage?: string;
   user_id?: string;
-  rate?: number;
+  rate?: number[];
   rateNum?: number;
   viewNum?: number;
   explain?: string;
@@ -29,6 +29,7 @@ export interface ResourceType {
   reviewTime?: Date;
   publishTime?: Date;
   create_time?: number | string;
+  starNum?: number;
   [props: string]: any;
 }
 

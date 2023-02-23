@@ -31,8 +31,33 @@ export default defineConfig({
           routes: [
             {
               name: '资源列表',
-              path: '/toolList',
-              component: './ToolList',
+              path: '/allResource',
+              component: './AllResource',
+            },
+            {
+              name: '我的收藏',
+              path: '/myStars',
+              component: './MyFavorite',
+            },
+            {
+              name: '搜索资源',
+              path: '/searchResource',
+              component: './SearchResource',
+            },
+            {
+              name: '面试宝典',
+              path: '/interview',
+              component: './Processing',
+            },
+            {
+              name: '前端社区',
+              path: '/friend',
+              component: './Processing',
+            },
+            {
+              name: '更多功能',
+              path: '/ranking',
+              component: './Processing',
             },
             {
               path: '/index',
@@ -49,8 +74,8 @@ export default defineConfig({
             },
             {
               path: '/',
-              redirect: '/toolList',
-              component: './ToolList',
+              redirect: '/allResource',
+              component: './AllResource',
             },
             {
               name: '个人设置',

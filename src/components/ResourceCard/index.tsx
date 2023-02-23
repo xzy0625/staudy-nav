@@ -1,4 +1,3 @@
-import { formatWan } from '@/pages/ToolList';
 import {
   EditOutlined,
   EllipsisOutlined,
@@ -13,19 +12,52 @@ import numeral from 'numeral';
 import styles from '../../pages/ToolList/style.less';
 import { useEffect, useState } from 'react';
 import getTags from '@/api/tags';
+import { likeResource, updateResource } from '@/services/resource';
+import { updateUser } from '@/services/user';
+import { getDvaApp } from 'umi';
+import { doShare } from '@/utils';
+
+export function formatWan(val: number) {
+  const v = val * 1;
+  if (!v || Number.isNaN(v)) return '';
+
+  let result: React.ReactNode = val;
+  if (val > 10000) {
+    result = (
+      <span>
+        {Math.floor(val / 10000)}
+        <span
+          style={{
+            position: 'relative',
+            top: -2,
+            fontSize: 14,
+            fontStyle: 'normal',
+            marginLeft: 2,
+          }}
+        >
+          万
+        </span>
+      </span>
+    );
+  }
+  return result;
+}
 
 interface IProps {
   showMenus?: Boolean;
   resource: ResourceType;
-  currentUser?: CurrentUser;
 }
 
 const ResourceCard: React.FC<IProps> = ({
   showMenus = true,
   resource,
-  currentUser = {},
 }: IProps) => {
-  const { _id, likeResourceIds, starResourceIds } = currentUser;
+  // 卸载这里比较麻烦，应该抛一个函数出去吧
+  const currentUser = getDvaApp()?._store?.getState()?.user
+    .currentUser as CurrentUser;
+  // 渲染用
+  const [count, setCount] = useState(0);
+  const { _id } = currentUser;
   const [tags, setTags] = useState<any>({});
 
   const onClickEdit = () => {
@@ -91,7 +123,6 @@ const ResourceCard: React.FC<IProps> = ({
   );
 
   const onClick = () => {
-    console.log(11111);
     history.push({
       pathname: '/resourseDetail',
       query: {
@@ -100,21 +131,140 @@ const ResourceCard: React.FC<IProps> = ({
     });
   };
 
+  // 喜欢资源
+  const onLikeResourceClick = async () => {
+    console.log(resource.likeNum, '????????');
+    if (!resource._id) {
+      message.error('这个资源似乎有点儿问题嗷');
+      return;
+    }
+    const myLike = currentUser?.likeResourceIds || [];
+    const isMylike = myLike.includes(resource._id);
+    let userState = null;
+    let resourceState = null;
+    if (isMylike) {
+      [userState, resourceState] = await Promise.all([
+        updateResource(resource._id, { likeNum: (resource.likeNum || 0) - 1 }),
+        updateUser(currentUser._id as string, {
+          likeResourceIds: myLike.filter((item) => item !== resource._id),
+        }),
+      ]);
+    } else {
+      // 更新喜欢数
+      [userState, resourceState] = await Promise.all([
+        updateResource(resource._id, { likeNum: (resource.likeNum || 0) + 1 }),
+        updateUser(currentUser._id as string, {
+          likeResourceIds: [...myLike, resource._id],
+        }),
+      ]);
+    }
+
+    if (userState && resourceState) {
+      if (isMylike) {
+        resource.likeNum = (resource.likeNum || 0) - 1;
+      } else {
+        resource.likeNum = (resource.likeNum || 0) + 1;
+      }
+      // 用来做视图的重新渲染
+      setCount((count) => count + 1);
+      message.success(`${isMylike ? '取消点赞成功' : '点赞成功'}`);
+    } else {
+      message.error('操作失败');
+    }
+  };
+
+  // 收藏资源，，感觉这里也可以弄成一个方法，和上面重复了
+  const onStarResourceClick = async () => {
+    if (!resource._id) {
+      message.error('这个资源似乎有点儿问题嗷');
+      return;
+    }
+    const myStars = currentUser?.starResourceIds || [];
+    const isMyStar = myStars.includes(resource._id);
+    let userState = null;
+    let resourceState = null;
+    if (isMyStar) {
+      [userState, resourceState] = await Promise.all([
+        updateResource(resource._id, { starNum: (resource.starNum || 0) - 1 }),
+        updateUser(currentUser._id as string, {
+          starResourceIds: myStars.filter((item) => item !== resource._id),
+        }),
+      ]);
+    } else {
+      // 更新喜欢数
+      [userState, resourceState] = await Promise.all([
+        updateResource(resource._id, { starNum: (resource.starNum || 0) + 1 }),
+        updateUser(currentUser._id as string, {
+          starResourceIds: [...myStars, resource._id],
+        }),
+      ]);
+    }
+
+    if (userState && resourceState) {
+      if (isMyStar) {
+        resource.starNum = (resource.starNum || 0) - 1;
+      } else {
+        resource.starNum = (resource.starNum || 0) + 1;
+      }
+      // 用来做视图的重新渲染
+      setCount((count) => count + 1);
+      message.success(`${isMyStar ? '取消收藏成功' : '收藏成功'}`);
+    } else {
+      message.error('操作失败');
+    }
+  };
+
+  const onShareClick = () => {
+    doShare(resource);
+  };
+
   return (
     <div>
       <Card
         hoverable
         bodyStyle={{ paddingBottom: 20 }}
         actions={[
-          <Tooltip key="download" title="点赞">
-            <LikeOutlined />
-          </Tooltip>,
-          <Tooltip key="edit" title="收藏">
-            <StarOutlined />
-          </Tooltip>,
-          <Tooltip title="分享" key="share">
-            <ShareAltOutlined />
-          </Tooltip>,
+          <div onClick={onLikeResourceClick}>
+            <Tooltip
+              key="like"
+              title={
+                currentUser?.likeResourceIds?.includes(resource?._id)
+                  ? '取消点赞'
+                  : '点赞'
+              }
+            >
+              <LikeOutlined
+                style={{
+                  ...(currentUser?.likeResourceIds?.includes(resource?._id)
+                    ? { color: '#438df5' }
+                    : null),
+                }}
+              />
+            </Tooltip>
+          </div>,
+          <div onClick={onStarResourceClick}>
+            <Tooltip
+              key="star"
+              title={
+                currentUser?.starResourceIds?.includes(resource?._id)
+                  ? '取消收藏'
+                  : '收藏'
+              }
+            >
+              <StarOutlined
+                style={{
+                  ...(currentUser?.starResourceIds?.includes(resource?._id)
+                    ? { color: '#438df5' }
+                    : null),
+                }}
+              />
+            </Tooltip>
+          </div>,
+          <div onClick={onShareClick}>
+            <Tooltip title="分享" key="share">
+              <ShareAltOutlined />
+            </Tooltip>
+          </div>,
           showMenus && (
             <Dropdown key="ellipsis" overlay={itemMenu}>
               <EllipsisOutlined />
@@ -129,8 +279,8 @@ const ResourceCard: React.FC<IProps> = ({
         />
         <div className={styles.cardItemContent} onClick={onClick}>
           <CardInfo
-            activeUser={formatWan(1000)}
-            newUser={numeral(2000).format('0,0')}
+            activeUser={numeral(resource.likeNum).format('0,0')}
+            newUser={numeral(resource.starNum).format('0,0')}
           />
         </div>
       </Card>

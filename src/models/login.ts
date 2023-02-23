@@ -86,7 +86,6 @@ const Model: LoginModelType = {
         history.replace(redirect || '/accountsettings');
       }
     },
-
     *logout(_, { put }) {
       const { redirect } = getPageQuery();
       Cookies.remove(LOGIN_STATUS);

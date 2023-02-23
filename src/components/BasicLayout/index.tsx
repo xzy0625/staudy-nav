@@ -9,6 +9,7 @@ import { connect, history, Link } from 'umi';
 import {
   AppstoreOutlined,
   BarChartOutlined,
+  BulbOutlined,
   GlobalOutlined,
   HomeOutlined,
   SafetyOutlined,
@@ -165,18 +166,21 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
                 个人
               </Menu.Item>
             )}
-            <Menu.Item key="/toolList" icon={<SketchOutlined />}>
+            <Menu.Item key="/allResource" icon={<SketchOutlined />}>
               资源合集
             </Menu.Item>
-            <Menu.Item key="/resources" icon={<AppstoreOutlined />}>
+            <Menu.Item key="/myStars" icon={<AppstoreOutlined />}>
               个人收藏
             </Menu.Item>
-            <SubMenu key="/world" icon={<GlobalOutlined />} title="世界">
+            <Menu.Item key="/interview" icon={<BulbOutlined />}>
+              面试宝典
+            </Menu.Item>
+            <SubMenu key="/world" icon={<GlobalOutlined />} title="发现">
               <Menu.Item key="/friend" icon={<UserAddOutlined />}>
-                找伙伴
+                前端社区
               </Menu.Item>
               <Menu.Item key="/ranking" icon={<BarChartOutlined />}>
-                激励榜
+                更多功能
               </Menu.Item>
             </SubMenu>
             {currentUser._id && currentAuthority.includes('admin') && (
@@ -201,12 +205,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     </ProLayout>
   );
 };
-
-// export default connect(({ login, user }: ConnectState) => ({
-//   currentUser: user.currentUser,
-//   userId: login.userId,
-//   currentAuthority: login.currentAuthority,
-// }))(BasicLayout);
 
 export default connect(() => ({
   currentUser: '',

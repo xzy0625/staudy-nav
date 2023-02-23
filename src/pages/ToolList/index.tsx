@@ -1,10 +1,4 @@
 import {
-  DownloadOutlined,
-  EditOutlined,
-  EllipsisOutlined,
-  ShareAltOutlined,
-} from '@ant-design/icons';
-import {
   Avatar,
   Card,
   Col,
@@ -18,14 +12,12 @@ import {
   Select,
   Tooltip,
 } from 'antd';
-import numeral from 'numeral';
 import { FC, useEffect, useState } from 'react';
 import React from 'react';
-import { ResourceType, useRequest } from 'umi';
+import { ResourceType } from 'umi';
 import StandardFormRow from './components/StandardFormRow';
 import TagSelect from './components/TagSelect';
-import type { IPagination, ListItemDataType } from './type';
-import { queryFakeList } from './service';
+import type { IPagination } from './type';
 import styles from './style.less';
 import getTags from '@/api/tags';
 import { defaultPagination } from '@/const';
@@ -35,58 +27,11 @@ import {
   searchResourcesByPage,
 } from '../../services/resource';
 
-const { Option } = Select;
-
-export function formatWan(val: number) {
-  const v = val * 1;
-  if (!v || Number.isNaN(v)) return '';
-
-  let result: React.ReactNode = val;
-  if (val > 10000) {
-    result = (
-      <span>
-        {Math.floor(val / 10000)}
-        <span
-          style={{
-            position: 'relative',
-            top: -2,
-            fontSize: 14,
-            fontStyle: 'normal',
-            marginLeft: 2,
-          }}
-        >
-          万
-        </span>
-      </span>
-    );
-  }
-  return result;
+interface IProps {
+  extraCondition?: {};
 }
 
-const formItemLayout = {
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 16 },
-  },
-};
-
-const CardInfo: React.FC<{
-  activeUser: React.ReactNode;
-  newUser: React.ReactNode;
-}> = ({ activeUser, newUser }) => (
-  <div className={styles.cardInfo}>
-    <div>
-      <p>活跃用户</p>
-      <p>{activeUser}</p>
-    </div>
-    <div>
-      <p>新增用户</p>
-      <p>{newUser}</p>
-    </div>
-  </div>
-);
-
-export const ToolList: FC<Record<string, any>> = () => {
+export const ToolList: FC<IProps> = ({ extraCondition }: IProps) => {
   // 标签数据
   const [tags, setTags]: [IAnyObject, any] = useState({});
   // 分页数据
@@ -114,7 +59,10 @@ export const ToolList: FC<Record<string, any>> = () => {
   const getListData = async (condition: ResourceSearchParams) => {
     setLoading(true);
     try {
-      const data = await searchResourcesByPage(condition);
+      const data = await searchResourcesByPage({
+        ...condition,
+        ...extraCondition,
+      });
       setResourceData(data?.data || []);
       setTotal(data.total ?? 0);
     } catch (error) {
@@ -137,7 +85,6 @@ export const ToolList: FC<Record<string, any>> = () => {
 
   // 选了标签之后需要重新拉取数据
   const onValuesChange = (value: any) => {
-    console.log('ssssss');
     setPagination({ ...pagination, page: 1 });
     getListData({
       pageNum: 1,
@@ -150,7 +97,7 @@ export const ToolList: FC<Record<string, any>> = () => {
   useEffect(() => {
     initTags();
     getListData({});
-  }, []);
+  }, [extraCondition]);
 
   return (
     <div className={styles.filterCardList}>
