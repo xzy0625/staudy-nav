@@ -6,16 +6,29 @@ import BindingView from './components/binding';
 import NotificationView from './components/notification';
 import SecurityView from './components/security';
 import styles from './style.less';
+import { connect, CurrentUser } from 'umi';
+import { ConnectState } from '@/models/connect';
 
 const { Item } = Menu;
 
-type AccountSettingsStateKeys = 'base' | 'security' | 'binding' | 'notification';
+type AccountSettingsStateKeys =
+  | 'base'
+  | 'security'
+  | 'binding'
+  | 'notification';
 type AccountSettingsState = {
   mode: 'inline' | 'horizontal';
   selectKey: AccountSettingsStateKeys;
 };
 
-const AccountSettings: React.FC = () => {
+interface IProps {
+  currentUser: CurrentUser;
+  [props: string]: any;
+}
+
+const AccountSettings: React.FC<IProps> = (props: IProps) => {
+  const { currentUser } = props;
+
   const menuMap: Record<string, React.ReactNode> = {
     base: '基本设置',
     security: '安全设置',
@@ -42,7 +55,10 @@ const AccountSettings: React.FC = () => {
       if (window.innerWidth < 768 && offsetWidth > 400) {
         mode = 'horizontal';
       }
-      setInitConfig({ ...initConfig, mode: mode as AccountSettingsState['mode'] });
+      setInitConfig({
+        ...initConfig,
+        mode: mode as AccountSettingsState['mode'],
+      });
     });
   };
 
@@ -57,14 +73,16 @@ const AccountSettings: React.FC = () => {
   }, [dom.current]);
 
   const getMenu = () => {
-    return Object.keys(menuMap).map((item) => <Item key={item}>{menuMap[item]}</Item>);
+    return Object.keys(menuMap).map((item) => (
+      <Item key={item}>{menuMap[item]}</Item>
+    ));
   };
 
   const renderChildren = () => {
     const { selectKey } = initConfig;
     switch (selectKey) {
       case 'base':
-        return <BaseView />;
+        return <BaseView currentUser={currentUser} />;
       case 'security':
         return <SecurityView />;
       case 'binding':
@@ -108,4 +126,7 @@ const AccountSettings: React.FC = () => {
     </GridContent>
   );
 };
-export default AccountSettings;
+
+export default connect(({ loading, user, tag }: ConnectState) => ({
+  currentUser: user.currentUser,
+}))(AccountSettings);

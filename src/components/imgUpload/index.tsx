@@ -11,6 +11,7 @@ interface IProps {
   action?: string;
   shape?: 'round' | 'rect';
   modalWidth?: number | string;
+  value?: string;
 }
 
 // 图片裁剪上传组件
@@ -18,13 +19,23 @@ const ImgUpload: React.FC<IProps> = (porops: IProps) => {
   const {
     maxCount,
     onChange,
-    action = `${baseUrlDev}common/uploadFile`,
+    action = `${baseUrl}common/uploadFile`,
     shape = 'round',
     modalWidth,
+    value = '',
   } = porops;
 
+  const initValue = value
+    ? [
+        {
+          url: value,
+          name: '图片',
+        },
+      ]
+    : [];
+
   const [loading, setLoading] = useState(false);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>(initValue);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const [previewTitle, setPreviewTitle] = useState('');
@@ -36,6 +47,9 @@ const ImgUpload: React.FC<IProps> = (porops: IProps) => {
     fileList: UploadFile[];
     file: UploadFile;
   }) => {
+    if (file.status === 'removed') {
+      onChange?.('');
+    }
     if (file.status === 'uploading') {
       setLoading(true);
     }

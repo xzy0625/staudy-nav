@@ -54,7 +54,7 @@ export async function updateUser(userId: string, userInfo: CurrentUser) {
     })
     .then((res: any) => {
       if (res?.result?.code === 0) {
-        console.log(res, '....1111111.....');
+        // console.log(res, '....1111111.....');
         dispatch({
           type: 'user/setCurrentUser',
           payload: res?.result?.data?.data?.[0] || {},

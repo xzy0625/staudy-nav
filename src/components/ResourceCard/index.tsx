@@ -231,7 +231,7 @@ const ResourceCard: React.FC<IProps> = ({
   };
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <Card
         hoverable
         bodyStyle={{ paddingBottom: 20 }}

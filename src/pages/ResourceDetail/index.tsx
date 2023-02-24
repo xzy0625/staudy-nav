@@ -1,6 +1,7 @@
 import login from '@/api/account/login';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import PreviewAvator from '@/components/PreviewAvator';
+import ResourceCard from '@/components/ResourceCard';
 import { LOGIN_TYPE, RESOURCE_TAB_TYPE } from '@/const';
 import { ConnectState } from '@/models/connect';
 import { searchResources, updateResource } from '@/services/resource';
@@ -22,6 +23,7 @@ import {
   Col,
   Divider,
   Dropdown,
+  List,
   Menu,
   message,
   Row,
@@ -29,15 +31,17 @@ import {
   Tooltip,
 } from 'antd';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { createRef, ReactNode, useEffect, useState } from 'react';
 import {
   connect,
   CurrentUser,
   ResourceType,
   history,
   UserModelType,
+  CommentType,
 } from 'umi';
 import styles from './index.less';
+import Comment from '@/components/Comments/index';
 
 interface IProps {
   currentUser?: CurrentUser;
@@ -78,6 +82,8 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
   const [similarResource, setSimilarResource] = useState<ResourceType[]>(
     [] as ResourceType[],
   );
+  const [commentValue, setCommentValue] = useState('');
+  const editRef = createRef();
 
   // 获取这个资源的发布人
   const getResourceUserInfo = async () => {
@@ -128,16 +134,15 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
         pageNum: 1,
         pageSize: 1000000,
       });
-      const len = 5 < res.length ? 5 : res.length;
-      const index = [
+      const len = 4 < res.length ? 4 : res.length;
+      const indexs = [
         ...new Set(
           new Array(len)
             .fill(0)
             .map(() => Math.floor(Math.random() * res.length)),
         ),
       ];
-      // console.log(res,index, '.......作者的资源')
-      setUserResource((res ?? []).filter((item) => index.includes(item)));
+      setUserResource((res ?? []).filter((_, index) => indexs.includes(index)));
     } catch (error) {
       message.error('获取资源错误，请稍后重试');
     }
@@ -152,15 +157,16 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
         pageSize: 1000000,
       });
       const len = 5 < res.length ? 5 : res.length;
-      const index = [
+      const indexs = [
         ...new Set(
           new Array(len)
             .fill(0)
             .map(() => Math.floor(Math.random() * res.length)),
         ),
       ];
-      // console.log(res,index, '.......相似的资源')
-      setSimilarResource((res ?? []).filter((item) => index.includes(item)));
+      setSimilarResource(
+        (res ?? []).filter((_: any, index: number) => indexs.includes(index)),
+      );
     } catch (error) {
       message.error('获取资源错误，请稍后重试');
     }
@@ -173,7 +179,7 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
   const avatorTime = (
     <div>
       <span>
-        {moment(resource.create_time as number).format('YYYY-MM-DD HH:MM')}
+        {moment(resource.create_time as number).format('YYYY-MM-DD HH:mm:ss')}
       </span>
       <span style={{ margin: '0 10px' }}>
         <Divider type="vertical" />
@@ -182,30 +188,107 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
     </div>
   );
 
+  // 发送评论
+  const sendComments = async () => {
+    if (!commentValue && !resource._id) {
+      message.warning('请先写点儿东西吧~');
+      return;
+    }
+    const commentValueSubmit: CommentType = {
+      value: commentValue,
+      userId: currentUser._id as string,
+      url: currentUser.head_img,
+      createTime: Date.now(),
+      likeNum: 0,
+      nickName: currentUser.nickname,
+    };
+    const status = await updateResource(resource._id, {
+      commentList: [...(resource?.commentList || []), commentValueSubmit],
+    });
+    if (status) {
+      setResource({
+        ...resource,
+        commentList: [...(resource?.commentList || []), commentValueSubmit],
+      });
+      message.success('评论发表成功');
+      setCommentValue(''); // 置空评论
+    } else {
+      message.error('评论发表失败');
+    }
+  };
+
   // 评论组件
   const commentComp = (
     <div>
-      <h2>{26} 条评论</h2>
+      <h2>{resource?.commentList?.length || 0} 条评论</h2>
       <Divider />
       <div className={styles.comment}>
         <PreviewAvator src={currentUser.head_img} alt="头像" size="large" />
         <div style={{ marginLeft: '20px', width: '100%' }}>
           <MarkdownEditor
+            ref={editRef}
+            value={commentValue}
+            onChange={(value) => {
+              setCommentValue(value);
+            }}
             placeholder="请输入友善的评论吧，全屏编辑体验更好哦！"
-            style={{ width: '100%', boxShadow: 'rgb(0 0 0 ) 0px 0px 0px' }}
+            style={{
+              width: '100%',
+              boxShadow: 'rgb(0 0 0 ) 0px 0px 0px',
+              minHeight: '200px',
+            }}
           />
-          <Button size="middle" type="primary" style={{ marginTop: '6px' }}>
+          <Button
+            onClick={sendComments}
+            size="middle"
+            type="primary"
+            style={{ marginTop: '6px' }}
+          >
             发布评论
           </Button>
         </div>
       </div>
       <Divider />
-      <div>评论列表</div>
+      <div>
+        {(resource?.commentList || []).map((comment) => (
+          <Card>
+            <Card.Meta
+              avatar={<PreviewAvator size="large" src={comment?.url} />}
+              title={comment.nickName}
+              description={moment(comment.createTime as number).format(
+                'YYYY-MM-DD HH:mm:ss',
+              )}
+            />
+            <div
+              className={styles.commentValueStyle}
+              style={{ marginLeft: '56px', marginTop: '16px', width: '100%' }}
+            >
+              <Comment value={comment.value} />
+            </div>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 
   // 相似资源
-  const relateComp = <div>相似资源</div>;
+  const relateComp = (
+    <div>
+      <List<ResourceType>
+        rowKey="_id"
+        dataSource={similarResource}
+        split={false}
+        style={{ width: '100%' }}
+        renderItem={(item) => {
+          return (
+            <List.Item key={item._id} style={{ width: '100%' }}>
+              <ResourceCard showMenus={false} resource={item} />
+            </List.Item>
+          );
+        }}
+      />
+    </div>
+  );
 
   // map
   const keyMap = {
@@ -403,7 +486,6 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
                 title={resource?.name}
                 description={avatorTime}
               />
-              {/* <SimilarResources resource={resource} /> */}
               <Divider />
               <h2>{resource.desc}</h2>
               <p style={{ marginTop: '10px' }}>{resource.detail}</p>
@@ -455,9 +537,20 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
                 </div>
               </div>
             </Card>
-            <Card title="作者分享" hoverable style={{ marginTop: '30px' }}>
-              {/* <SimilarResources resource={resource} /> */}
-              相似资源
+            <Card title="作者其他分享" hoverable style={{ marginTop: '30px' }}>
+              <List<ResourceType>
+                rowKey="user_resource_id"
+                dataSource={userResource}
+                split={false}
+                style={{ width: '100%' }}
+                renderItem={(item) => {
+                  return (
+                    <List.Item key={item._id} style={{ width: '100%' }}>
+                      <ResourceCard showMenus={false} resource={item} />
+                    </List.Item>
+                  );
+                }}
+              />
             </Card>
           </Col>
         </Row>

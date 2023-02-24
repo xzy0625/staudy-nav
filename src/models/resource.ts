@@ -7,6 +7,15 @@ import {
 } from '@/services/resource';
 import { message } from 'antd';
 
+export interface CommentType {
+  value: string; // 内容
+  userId: string; // 用户ID
+  url?: string; // 用户头像URL
+  nickName?: string; // 用户昵称
+  createTime?: string | number; // 发布时间
+  likeNum?: number;
+}
+
 export interface ResourceType {
   _id?: string;
   name?: string;
@@ -30,6 +39,7 @@ export interface ResourceType {
   publishTime?: Date;
   create_time?: number | string;
   starNum?: number;
+  commentList?: CommentType[];
   [props: string]: any;
 }
 

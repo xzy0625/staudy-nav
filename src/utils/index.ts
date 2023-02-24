@@ -84,6 +84,6 @@ export const doShare = async (resource?: ResourceType) => {
     copy(
       `我在学习导航发现了『 ${resource.name} 』💎 快来看看 ${WEB_HOST}/resourseDetail/?id=${resource._id}`,
     );
-    message.success('链接已复制，感谢分享！');
+    message.success('链接已复制到剪切板，感谢分享！');
   }
 };
