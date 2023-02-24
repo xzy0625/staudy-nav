@@ -5,6 +5,11 @@ import { IPagination } from '../pages/ToolList/type';
 export const LOGIN_STATUS = 'loginStatus';
 
 /**
+ * 当天不提示
+ */
+export const SHOW_GREETING = 'showGreeting';
+
+/**
  * url 动态码键名
  */
 export const DYNAMIC_CAPTCHA = 'dc';

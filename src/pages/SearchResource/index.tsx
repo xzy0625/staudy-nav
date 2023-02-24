@@ -6,7 +6,6 @@ import { ToolList } from '../ToolList';
 export const SearchResource = (props: IAnyObject) => {
   const { currentUser, location } = props;
   const query = location.query.q;
-  console.log(query, '......');
 
   return (
     <div>

@@ -1,6 +1,8 @@
 import {
+  ChromeOutlined,
   EditOutlined,
   EllipsisOutlined,
+  GlobalOutlined,
   HeartOutlined,
   LikeOutlined,
   ShareAltOutlined,
@@ -230,6 +232,12 @@ const ResourceCard: React.FC<IProps> = ({
     doShare(resource);
   };
 
+  const onOpenClick = () => {
+    if (resource._id) {
+      window.open(resource.url || resource.link, '_blank');
+    }
+  };
+
   return (
     <div style={{ width: '100%' }}>
       <Card
@@ -275,6 +283,11 @@ const ResourceCard: React.FC<IProps> = ({
           <div onClick={onShareClick}>
             <Tooltip title="分享" key="share">
               <ShareAltOutlined />
+            </Tooltip>
+          </div>,
+          <div onClick={onOpenClick}>
+            <Tooltip title="前往" key="share">
+              <GlobalOutlined />
             </Tooltip>
           </div>,
           showMenus && (

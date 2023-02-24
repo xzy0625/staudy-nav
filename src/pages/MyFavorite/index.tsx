@@ -1,3 +1,4 @@
+import { NoAuth } from '@/components/NoAuth';
 import { ConnectState } from '@/models/connect';
 import { connect } from 'umi';
 import { ToolList } from '../ToolList';
@@ -6,8 +7,10 @@ import { ToolList } from '../ToolList';
 export const MyFavoriteResource = (props: IAnyObject) => {
   const { currentUser } = props;
 
-  return (
+  return currentUser._id ? (
     <ToolList extraCondition={{ _ids: currentUser?.starResourceIds || [] }} />
+  ) : (
+    <NoAuth />
   );
 };
 

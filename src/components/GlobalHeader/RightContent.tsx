@@ -27,7 +27,10 @@ const GlobalHeaderRight: React.SFC<GlobalHeaderRightProps> = (props) => {
     <div className={className}>
       {!isMobile() && (
         <Link to="/addResource/">
-          <Tooltip title="推荐资源，收获积分和人气" placement="bottomRight">
+          <Tooltip
+            title="推荐资源，为开源学习社区做出共享"
+            placement="bottomRight"
+          >
             <Button
               type="link"
               icon={<SendOutlined />}

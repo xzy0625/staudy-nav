@@ -37,7 +37,6 @@ export function getUserById(userId: string) {
  * @param resource
  */
 export async function updateUser(userId: string, userInfo: CurrentUser) {
-  console.log(userId, userInfo, '.....user');
   if (!userId || !userInfo) {
     return false;
   }
@@ -54,7 +53,6 @@ export async function updateUser(userId: string, userInfo: CurrentUser) {
     })
     .then((res: any) => {
       if (res?.result?.code === 0) {
-        // console.log(res, '....1111111.....');
         dispatch({
           type: 'user/setCurrentUser',
           payload: res?.result?.data?.data?.[0] || {},

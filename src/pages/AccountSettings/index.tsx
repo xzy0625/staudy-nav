@@ -8,6 +8,7 @@ import SecurityView from './components/security';
 import styles from './style.less';
 import { connect, CurrentUser } from 'umi';
 import { ConnectState } from '@/models/connect';
+import { NoAuth } from '@/components/NoAuth';
 
 const { Item } = Menu;
 
@@ -94,7 +95,7 @@ const AccountSettings: React.FC<IProps> = (props: IProps) => {
     }
   };
 
-  return (
+  return currentUser._id ? (
     <GridContent>
       <div
         className={styles.main}
@@ -124,6 +125,8 @@ const AccountSettings: React.FC<IProps> = (props: IProps) => {
         </div>
       </div>
     </GridContent>
+  ) : (
+    <NoAuth />
   );
 };
 

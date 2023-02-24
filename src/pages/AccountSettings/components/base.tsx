@@ -56,7 +56,6 @@ const BaseView: React.FC<any> = ({
   currentUser: CurrentUser;
 }) => {
   const handleFinish = async (values: IAnyObject) => {
-    console.log(values, '......');
     const status = await updateUser(currentUser._id, values);
     if (status) {
       message.success('更新基本信息成功');

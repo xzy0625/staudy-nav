@@ -16,7 +16,7 @@ import {
   SketchOutlined,
   UserAddOutlined,
 } from '@ant-design/icons';
-import { Button, Menu, notification, Result } from 'antd';
+import { Button, Menu, Modal, notification, Result } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import HeaderSearch from '@/components/HeaderSearch';
@@ -111,6 +111,23 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   }, []);
 
   useEffect(() => {
+    if (
+      currentUser._id &&
+      (!currentUser.head_img || !currentUser.nickname || !currentUser.username)
+    ) {
+      Modal.info({
+        title: '站内提示',
+        content: (
+          <div>
+            <p>您的身份信息暂不完善，请完善后再使用！</p>
+          </div>
+        ),
+        onOk() {
+          history.replace('/accountsettings');
+        },
+        okText: '立即前往',
+      });
+    }
     if (dispatch && userId && !currentUser._id) {
       dispatch({
         type: 'user/fetchCurrent',
@@ -161,11 +178,11 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
             onClick={({ key }) => history.push(key)}
             style={{ height: '100%', border: 0 }}
           >
-            {currentUser._id && (
+            {/* {currentUser._id && (
               <Menu.Item key="/account/info" icon={<HomeOutlined />}>
                 个人
               </Menu.Item>
-            )}
+            )} */}
             <Menu.Item key="/allResource" icon={<SketchOutlined />}>
               资源合集
             </Menu.Item>
@@ -206,8 +223,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   );
 };
 
-export default connect(() => ({
-  currentUser: '',
+export default connect(({ loading, user, tag }: ConnectState) => ({
+  currentUser: user.currentUser,
   userId: '',
   currentAuthority: '',
 }))(BasicLayout);
