@@ -107,3 +107,10 @@ export const getLeftTime = () => {
 
   return leftTime;
 };
+
+export function preloadingImages(arr: any[]) {
+  arr.forEach((item) => {
+    const img = new Image();
+    img.src = item;
+  });
+}

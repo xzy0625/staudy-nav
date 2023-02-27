@@ -24,3 +24,26 @@
 
 ### 踩坑
 1. plugin-dva只有modle中有export导出才会生效
+
+
+构建优化
+参考：https://juejin.cn/post/6844903781377785863
+1. 使用yarn add -D webpack-bundle-analyzer查看包大小
+2. 使用production模式进行打包，webpack production模式默认会进行优化
+3. 使用gzip进行处理，处理方式是通过配置nginx的方式  -- 参考：https://juejin.cn/post/7127076710335381517
+
+module -- 打包块，一个文件就是一个module
+chunk -- 正在打包的代码，可以通过splitChunks将一个chunk分成多个budle
+budle -- 最后生成的可用的文件
+
+
+遇到问题总结
+1. nginx + react History路由模式404问题  https://juejin.cn/post/6844903942942359560
+2. gzip压缩问题
+3. 图片优化问题
+  1. 不同的图片类型
+  2. 进行图片压缩，base64等等，降低图片的质量
+  3. 使用雪碧图 浏览器请求资源的时候，同源域名请求资源的时候有最大并发限制，chrome 为 6 个，就比如你的页面上有 10 个相同 CDN 域名小图片，那么需要发起 10 次请求去拉取，分两次并发。第一次并发请求回来后，发起第二次并发。如果你把 10 个小图片合并为一张大图片的画，那么只用一次请求即可拉取下来 10 个小图片的资源。减少服务器压力，减少并发，减少请求次数。
+  4. 先展示模糊的大图，再展示清晰的
+  5. 懒加载/ 预加载
+  6. 放在CDN

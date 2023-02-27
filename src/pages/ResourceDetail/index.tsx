@@ -190,7 +190,7 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
 
   // 发送评论
   const sendComments = async () => {
-    if (!commentValue && !resource._id) {
+    if (!commentValue || !resource._id) {
       message.warning('请先写点儿东西吧~');
       return;
     }

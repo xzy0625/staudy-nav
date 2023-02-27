@@ -6,15 +6,27 @@ export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
   },
-  analyze: {
-    analyzerMode: 'server',
-    analyzerPort: 8888,
-    openAnalyzer: true,
-    // generate stats file while ANALYZE_DUMP exist
-    generateStatsFile: false,
-    statsFilename: 'stats.json',
-    logLevel: 'info',
-    defaultSizes: 'parsed', // stat  // gzip
+  chunks: ['antdesigns', 'vendors', 'umi'],
+  chainWebpack: function (config, { webpack }) {
+    config.merge({
+      optimization: {
+        splitChunks: {
+          chunks: 'all',
+          minSize: 30000,
+          minChunks: 3,
+          automaticNameDelimiter: '.',
+          cacheGroups: {
+            vendor: {
+              name: 'vendors',
+              test({ resource }) {
+                return /[\\/]node_modules[\\/]/.test(resource);
+              },
+              priority: 10,
+            },
+          },
+        },
+      },
+    });
   },
   routes: [
     {

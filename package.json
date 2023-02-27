@@ -5,8 +5,12 @@
     "start": "umi dev",
     "build": "umi build",
     "postinstall": "umi generate tmp",
+    "build:pro": "UMI_ENV=prod umi build",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "test": "umi-test",
+    "dev:ana":"ANALYZE=1 umi dev",
+    "pro:ana": "ANALYZE=1 npm run build:pro",
+    "webpack:pro":"NODE_ENV=production umi webpack",
     "test:coverage": "umi-test --coverage"
   },
   "gitHooks": {
@@ -60,6 +64,7 @@
     "lint-staged": "^10.0.7",
     "prettier": "^2.2.0",
     "typescript": "^4.1.2",
+    "webpack-bundle-analyzer": "^4.8.0",
     "yorkie": "^2.0.0"
   }
 }
