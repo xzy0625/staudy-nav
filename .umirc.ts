@@ -3,6 +3,8 @@ import { getEnvConfig } from './src/utils/env';
 const env = getEnvConfig();
 export default defineConfig({
   define: env,
+  base: './',
+  publicPath: './',
   nodeModulesTransform: {
     type: 'none',
   },

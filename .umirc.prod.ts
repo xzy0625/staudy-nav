@@ -6,20 +6,24 @@ export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
   },
-  chunks: ['antdesigns', 'vendors', 'umi'],
   chainWebpack: function (config, { webpack }) {
     config.merge({
       optimization: {
+        minimize: true,
         splitChunks: {
           chunks: 'all',
-          minSize: 30000,
-          minChunks: 3,
-          automaticNameDelimiter: '.',
+          minSize: 10000, // 最小的体积，只有超过这个体积了才分包
+          minChunks: 1, // 有多少个chunk共享就拆分
+          name: false,
           cacheGroups: {
             vendor: {
-              name: 'vendors',
-              test({ resource }) {
-                return /[\\/]node_modules[\\/]/.test(resource);
+              chunks: 'all',
+              test: /[\\/]node_modules[\\/]/,
+              name(module) {
+                const packageName = module.context.match(
+                  /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
+                )[1];
+                return `${packageName.replace('@', '')}`;
               },
               priority: 10,
             },
@@ -27,7 +31,29 @@ export default defineConfig({
         },
       },
     });
+    1;
   },
+  // chainWebpack: function (config, { webpack }) {
+  //   config.merge({
+  //     optimization: {
+  //       splitChunks: {
+  //         chunks: 'all',
+  //         minSize: 30000,
+  //         minChunks: 1,
+  //         automaticNameDelimiter: '.',
+  //         cacheGroups: {
+  //           vendor: {
+  //             name: 'vendors',
+  //             test({ resource }) {
+  //               return /[\\/]node_modules[\\/]/.test(resource);
+  //             },
+  //             priority: 10,
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
+  // },
   routes: [
     {
       name: '注册页',
