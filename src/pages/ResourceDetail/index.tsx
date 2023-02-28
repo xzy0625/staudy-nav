@@ -10,6 +10,7 @@ import { doShare } from '@/utils';
 import {
   EditOutlined,
   EllipsisOutlined,
+  GlobalOutlined,
   LikeOutlined,
   ShareAltOutlined,
   StarOutlined,
@@ -422,6 +423,12 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
     doShare(resource);
   };
 
+  const onOpenClick = () => {
+    if (resource._id) {
+      window.open(resource.url || resource.link, '_blank');
+    }
+  };
+
   return (
     <div style={{ padding: '0 180px' }}>
       <GridContent>
@@ -476,6 +483,11 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
                     <ShareAltOutlined />
                   </Tooltip>
                 </div>,
+                <div onClick={onOpenClick}>
+                  <Tooltip title="前往" key="share">
+                    <GlobalOutlined />
+                  </Tooltip>
+                </div>,
                 <Dropdown key="ellipsis" overlay={itemMenu}>
                   <EllipsisOutlined />
                 </Dropdown>,
@@ -488,6 +500,7 @@ const ResourceDetail: React.FC<IProps> = (props: IProps) => {
               />
               <Divider />
               <h2>{resource.desc}</h2>
+              <a href={resource.url}>网站链接: {resource.url}</a>
               <p style={{ marginTop: '10px' }}>{resource.detail}</p>
             </Card>
             <Card

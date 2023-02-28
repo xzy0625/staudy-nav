@@ -65,7 +65,7 @@ const ResourceCard: React.FC<IProps> = ({
   const [tags, setTags] = useState<any>({});
 
   const onClickEdit = () => {
-    if (_id !== resource._id) {
+    if (_id !== resource.user_id) {
       message.error('你不是改资源的拥有者，无权修改');
       return;
     }

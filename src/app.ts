@@ -1,3 +1,5 @@
+import { LOGIN_STATUS } from '@/const/index';
+import Cookies from 'js-cookie';
 // import * as dotenv from 'dotenv'
 // import path from 'path';
 
@@ -7,7 +9,10 @@ import { preloadingImages } from './utils';
 // dotenv.config({ path: path.resolve(__dirname, './.env')});
 
 function preloader() {
-  const arr = ['http://resource.zyxiong.com/static/wall1.8457eb48.jpg'];
+  const arr = [
+    'https://csuxzy-1300770696.cos.ap-guangzhou.myqcloud.com/wall1.jpg',
+  ];
+  // const arrCDN = ['https://csuxzy-1300770696.file.myqcloud.com/wall1.jpg'];
   preloadingImages(arr);
 }
 
@@ -26,4 +31,7 @@ function addLoadEvent(func: any) {
   }
 }
 
-addLoadEvent(preloader);
+// 没有登录就有可能登录
+if (!Cookies.get(LOGIN_STATUS)) {
+  addLoadEvent(preloader);
+}

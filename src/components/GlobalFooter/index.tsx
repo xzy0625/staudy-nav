@@ -27,7 +27,13 @@ const GlobalFooter: React.FC = () => {
           key: 'contact',
           title: (
             <Tooltip
-              title={<img src={wechat} alt="微信 code_nav" width="200" />}
+              title={
+                <img
+                  src="https://csuxzy-1300770696.cos.ap-guangzhou.myqcloud.com/wechat.jpeg"
+                  alt="微信 code_nav"
+                  width="200"
+                />
+              }
             >
               <WechatOutlined /> 联系作者
             </Tooltip>

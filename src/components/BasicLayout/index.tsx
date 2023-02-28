@@ -28,7 +28,7 @@ import { stringify } from 'querystring';
 // import { closeNoticeWatcher, openNoticeWatcher } from '@/services/notice';
 import defaultSettings from '../../config/defaultSettings';
 import menu from '../../config/menu';
-import logo from '../../assets/logo.svg';
+// import logo from '../../assets/logo.svg';
 import './BasicLayout.less';
 
 const noMatch = (
@@ -151,7 +151,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
 
   return (
     <ProLayout
-      logo={logo}
+      // logo='https://csuxzy-1300770696.file.myqcloud.com/logo.svg'
+      logo="https://csuxzy-1300770696.cos.ap-guangzhou.myqcloud.com/logo.svg"
       {...props}
       {...defaultSettings}
       layout="top"
